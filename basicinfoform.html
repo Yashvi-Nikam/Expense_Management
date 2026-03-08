@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Basic Information</title>
+<link rel="stylesheet" href="formstyle.css">
+</head>
+
+<body>
+
+<div class="form-container">
+
+<h1 class="title">Basic Information</h1>
+
+<form id="generalForm">
+
+<label>Full Name</label>
+<input type="text" placeholder="Enter your name">
+
+<label>Age</label>
+<input type="number" placeholder="Enter your age">
+
+<label>Gender</label>
+<select>
+<option>Select</option>
+<option>Male</option>
+<option>Female</option>
+<option>Other</option>
+</select>
+<br>
+<label>Occupation</label>
+<br>
+
+<label>
+<input type="radio" name="occupation" value="student"> Student
+</label>
+
+<label>
+<input type="radio" name="occupation" value="employed"> Employed
+</label>
+
+<label>
+<input type="radio" name="occupation" value="housewife"> Homemaker
+</label>
+
+<label>
+<input type="radio" name="occupation" value="unemployed"> Unemployed
+</label>
+
+
+
+<br><br>
+<button type="submit">Next</button>
+
+</form>
+
+</div>
+
+</body>
+</html>
+
+<script>
+
+document.getElementById("generalForm").addEventListener("submit", function(e) {
+
+e.preventDefault();
+
+let selected = document.querySelector('input[name="occupation"]:checked');
+
+if(!selected){
+alert("Please select your occupation");
+return;
+}
+
+let occupation = selected.value;
+
+if (occupation === "student") {
+window.location.href = "studentform.html";
+}
+
+else if (occupation === "employed") {
+window.location.href = "employed_form.html";
+}
+
+else if (occupation === "unemployed") {
+window.location.href = "unemployed_form.html";
+}
+
+else if (occupation === "housewife") {
+window.location.href = "housewife_form.html";
+}
+
+});
+
+</script>

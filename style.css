@@ -1,0 +1,103 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    height:100vh;
+
+    /* Background image */
+    background-image:url('background.jpg');
+    background-size:cover;
+    background-position:center;
+   /* background-repeat:no-repeat; */
+}
+
+/* Main container */
+
+.container{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-start;
+    height:100vh;
+    padding-top:80px;
+}
+
+/* Welcome header */
+
+.header{
+    margin-bottom:40px;
+}
+
+.app-name{
+    font-size:80px;   /* bigger welcome text */
+    font-weight:700;
+    color:whitesmoke;   /* deep pink */
+    text-shadow:1px 1px 6px rgba(0,0,0,0.35);
+}
+
+/* Welcome card */
+
+.welcome-card{
+    background:rgba(255, 255, 255, 0.5);   /* transparent card */
+    backdrop-filter:blur(6px);
+
+    border-radius:20px;
+    box-shadow:0 15px 40px rgba(0,0,0,0.3);
+
+    padding:50px 40px;
+
+    max-width:500px;
+    width:90%;
+
+    text-align:center;
+}
+
+/* Welcome text */
+
+.welcome-text{
+    font-size:28px;
+    color:rgb(51, 28, 48);
+    margin-bottom:35px;
+    line-height:1.4;
+}
+
+/* Buttons container */
+
+.buttons-container{
+    display:flex;
+    justify-content:center;
+    gap:15px;
+    margin-bottom:25px;
+}
+
+/* Buttons */
+
+.btn{
+    padding:14px 32px;
+    font-size:16px;
+    font-weight:600;
+    text-decoration:none;
+    border-radius:10px;
+    color:#ffff;
+    background:#c7a54a;   /* pink button */
+    transition:0.3s;
+}
+
+.btn:hover{
+    background:#b4933f;
+    transform:translateY(-2px);
+}
+
+
+/* Tagline */
+
+.tagline{
+   color:#474747;
+font-size:16px;
+font-style: italic;
+ 
+}

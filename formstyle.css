@@ -1,0 +1,75 @@
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Segoe UI, sans-serif;
+}
+
+.form-container{
+width: 800px;
+max-width: 90%;
+margin: 60px auto;
+padding: 40px;
+background: white;
+border-radius: 12px;
+box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+body{
+font-family: Arial, sans-serif;
+background-color: #8aa8c5;
+margin:0;
+padding:0;
+}
+
+input[type="radio"]{
+margin-right:8px;
+width:auto;   /* prevents radios from stretching */
+}
+
+input[type="radio"] + text{
+font-weight:500;
+}
+
+h2{
+text-align:center;
+margin-bottom:25px;
+font-weight:600;
+}
+
+label{
+font-size:16px;
+font-weight:600;
+color:#333;
+display:block;
+margin-top:12px;
+margin-bottom:6px;
+}
+
+/* apply width only to text inputs and select */
+input[type="text"],
+input[type="number"],
+select{
+width:100%;
+padding:12px;
+font-size:15px;
+margin-top:6px;
+margin-bottom:18px;
+border:1px solid #ccc;
+border-radius:6px;
+}
+
+button{
+width:100%;
+padding:12px;
+background:#2f3e46;
+color:white;
+border:none;
+border-radius:6px;
+font-size:16px;
+cursor:pointer;
+}
+
+button:hover{
+background:#354f52;
+}
