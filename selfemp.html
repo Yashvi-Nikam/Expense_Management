@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Self Employed Expense Form</title>
+<script>
+function validateSelf()
+{
+let income = document.getElementById("income").value;
+let rent = document.getElementById("rent").value;
+let materials = document.getElementById("materials").value;
+let salary = document.getElementById("salary").value;
+let electricity = document.getElementById("electricity").value;
+let food = document.getElementById("food").value;
+let transport = document.getElementById("transport").value;
+let saving = document.getElementById("saving").value;
+if(isNaN(income)){
+alert("Please enter numbers only in Monthly Income.");
+return false;
+}
+if(isNaN(rent))
+{
+alert("Please enter numbers  in Rent.");
+return false;
+}
+if(isNaN(materials)){
+alert("Please enter numbers  in Materials.");
+return false;
+}
+if(isNaN(salary)){
+alert("Please enter numbers  in Staff Salary.");
+return false;
+}
+if(isNaN(electricity)){
+alert("Please enter numbers  in Electricity / Internet.");
+return false;
+}
+if(isNaN(food)){
+alert("Please enter numbers in Food / Grocery.");
+return false;
+}
+if(isNaN(transport)){
+alert("Please enter numbers only in Transport.");
+return false;
+}
+if(isNaN(saving)){
+alert("Please enter numbers in Monthly Saving Amount.");
+return false;
+}
+alert("Form Submitted Successfully!");
+setTimeout(function(){
+window.location.href="dashboard.html";
+},2000);
+return false;
+}
+</script>
+<style>
+body{
+    font-family: Arial;
+    background:#f5f5f5;
+}
+.container{
+    width:420px;
+    margin:auto;
+    margin-top:40px;
+    background:white;
+    padding:25px;
+    border-radius:10px;
+}
+input{
+    width:100%;
+    padding:8px;
+    margin:8px 0;
+}
+button{
+    width:100%;
+    padding:10px;
+    background:#28a745;
+    color:white;
+    border:none;
+}
+</style>
+</head>
+<body>
+<div class="container">
+<h2>Self Employed Expense Form</h2>
+<form onsubmit="return validateSelf()
+">
+<label>Full Name</label>
+<input type="text" name="name"  required>
+<label>Business / Profession</label>
+<input type="text" name="business" required>
+<label>Approx Monthly Income</label>
+<input type="text" id="income" name="income" required>
+<h3>Business Expenses</h3>
+<label>Shop / Office Rent</label>
+<input type="text" id="rent" name="rent">
+<label>Raw Materials / Supplies</label>
+<input type="text" id="materials" name="materials" required>
+<label>Staff Salary</label>
+<input type="text" id="salary" name="salary" required>
+<label>Electricity / Internet</label>
+<input type="text" id="electricity" name="utilities">
+<h3>Personal Expenses</h3>
+<label>Food / Grocery</label>
+<input type="text"  id="food" name="food" required>
+<label>Transport</label>
+<input type="text" id="transport" name="transport" required>
+<label>Other Expenses</label>
+<input type="text" name="other">
+<label>Monthly Saving Amount</label>
+<input type="text" id="saving" name="saving" required>
+<label>Saving Goal</label>
+<input type="text" name="goal">
+<button type="submit">Submit</button>
+</form>
+</div>
+</body>
+</html>
+
