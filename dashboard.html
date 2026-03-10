@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+<title>Finance Dashboard</title>
+
+<link rel="stylesheet" href="dashboard.css">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+<button class="menuBtn" onclick="toggleMenu()">☰</button>
+
+<!-- SIDEBAR -->
+
+<div id="sidebar" class="sidebar">
+
+<input type="file" id="photoUpload" accept="image/*">
+<img id="profilePhoto" class="profile" src="default.png">
+
+<button onclick="openPage('userInfo.php')">User Info</button>
+<button onclick="openPage('expenseHistory.php')">Expense History</button>
+<button onclick="openPage('monthlyReport.php')">Monthly Report</button>
+
+<button onclick="toggleSettings()">Settings</button>
+
+<div id="settingsMenu" class="submenu">
+
+<button onclick="openPage('reset_password.html')">Reset Password</button>
+
+<button onclick="deleteAccount()">Delete Account</button>
+
+</div>
+
+<button onclick="logout()">Logout</button>
+
+</div>
+
+<div id="overlay" onclick="toggleMenu()"></div>
+
+<!-- MAIN DASHBOARD -->
+
+<div class="main">
+
+<h1>Welcome, User</h1>
+
+<div class="summary">
+
+<div class="card">
+<h3>Total Income</h3>
+<p>₹50000</p>
+</div>
+
+<div class="card">
+<h3>Total Expense</h3>
+<p>₹30000</p>
+</div>
+
+<div class="card">
+<h3>Total Savings</h3>
+<p>₹20000</p>
+</div>
+
+</div>
+
+<!-- CHARTS -->
+
+<div class="chart-container">
+
+<div class="chart-box">
+<h3>Expense Distribution</h3>
+<canvas id="pieChart"></canvas>
+</div>
+
+<div class="chart-box">
+<h3>Income vs Expense</h3>
+<canvas id="barChart"></canvas>
+</div>
+
+</div>
+
+<!-- SAVINGS PROGRESS -->
+
+<div class="progress-box">
+
+<h3>Savings Goal Progress</h3>
+
+<div class="progress-bar">
+
+<div class="progress-fill">40%</div>
+
+</div>
+
+</div>
+
+<!-- CURRENT MONTH SECTION -->
+
+<section class="monthlySection">
+
+<h2>Current Month Transactions</h2>
+
+<table>
+
+<tr>
+<th>Date</th>
+<th>Type</th>
+<th>Category</th>
+<th>Description</th>
+<th>Amount</th>
+</tr>
+
+<tr>
+<td>10 Mar</td>
+<td>Expense</td>
+<td>Food</td>
+<td>Lunch</td>
+<td>₹300</td>
+</tr>
+
+<tr>
+<td>9 Mar</td>
+<td>Income</td>
+<td>Freelance</td>
+<td>Design Work</td>
+<td>₹2000</td>
+</tr>
+
+</table>
+
+</section>
+
+</div>
+
+<script src="dashboard.js"></script>
+
+</body>
+</html>
