@@ -68,12 +68,12 @@ button{
 <body>
 <div class="container">
 <h2>Unemployed Expense Form</h2>
-<form onsubmit="return validateUnemployed()">
+<form onsubmit="return validateUnemployed()" action="dashboard.html" method="post">
 <label>Full Name</label>
 <input type="text" name="name" required>
 <label>Source of Money</label>
-<select name="source">
-<option>Family Support</option>
+<select name="source" >
+<option>Select</option>
 <option>Savings</option>
 <option>Freelancing</option>
 <option>Other</option>
