@@ -44,6 +44,10 @@
 </label>
 
 <label>
+<input type="radio" name="occupation" value="self-employed"> Self-Employed
+</label>
+
+<label>
 <input type="radio" name="occupation" value="unemployed"> Unemployed
 </label>
 
@@ -75,7 +79,7 @@ return;
 let occupation = selected.value;
 
 if (occupation === "student") {
-window.location.href = "studentform.html";
+window.location.href = "student_form.html";
 }
 
 else if (occupation === "employed") {
@@ -88,6 +92,10 @@ window.location.href = "unemployed_form.html";
 
 else if (occupation === "housewife") {
 window.location.href = "housewife_form.html";
+}
+
+else if (occupation === "self-employed") {
+window.location.href = "selfemployed_form.html";
 }
 
 });
