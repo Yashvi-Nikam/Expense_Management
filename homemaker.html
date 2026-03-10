@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homemaker Budget Form</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            background-image: url('expenseimage.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        input[type="text"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: Arial, sans-serif;
+        }
+        
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+        }
+        
+        .radio-group {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .radio-group label {
+            margin-bottom: 0;
+            font-weight: normal;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .radio-group input[type="radio"] {
+            width: auto;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+        }
+        
+        .conditional-input {
+            display: none;
+            margin-top: 10px;
+        }
+        
+        .conditional-input.show {
+            display: block;
+        }
+        
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        .required {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Household Budget Planner</h1>
+        
+        <form id="budgetForm">
+            <!-- Full Name -->
+            <div class="form-group">
+                <label for="fullName">What is your full name? <span class="required">*</span></label>
+                <input type="text" id="fullName" name="fullName" required>
+            </div>
+            
+            <!-- Total Monthly Budget -->
+            <div class="form-group">
+                <label for="monthlyBudget">What is the total monthly household budget available to you? <span class="required">*</span></label>
+                <input type="number" id="monthlyBudget" name="monthlyBudget" placeholder="Enter amount" required>
+            </div>
+            
+            <!-- Main Source of Income -->
+            <div class="form-group">
+                <label>What is the main source of household income? <span class="required">*</span></label>
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" name="incomeSource" value="Husband" required> Husband
+                    </label>
+                    <label>
+                        <input type="radio" name="incomeSource" value="Family Business" required> Family Business
+                    </label>
+                    <label>
+                        <input type="radio" name="incomeSource" value="Other" required> Other
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Groceries -->
+            <div class="form-group">
+                <label for="groceries">How much do you spend on groceries per month? <span class="required">*</span></label>
+                <input type="number" id="groceries" name="groceries" placeholder="Enter amount" required>
+            </div>
+            
+            <!-- Utilities -->
+            <div class="form-group">
+                <label for="utilities">How much do you spend on household utilities? (Electricity, Water, Gas) <span class="required">*</span></label>
+                <input type="number" id="utilities" name="utilities" placeholder="Enter amount" required>
+            </div>
+            
+            <!-- Children's Education -->
+            <div class="form-group">
+                <label for="education">How much do you spend on children's education or school needs? <span class="required">*</span></label>
+                <input type="number" id="education" name="education" placeholder="Enter amount" required>
+            </div>
+            
+            <!-- Transportation -->
+            <div class="form-group">
+                <label for="transportation">How much do you spend on transportation or travel? <span class="required">*</span></label>
+                <input type="number" id="transportation" name="transportation" placeholder="Enter amount" required>
+            </div>
+            
+            <!-- Personal/Household Shopping -->
+            <div class="form-group">
+                <label for="shopping">How much do you spend on personal or household shopping? <span class="required">*</span></label>
+                <input type="number" id="shopping" name="shopping" placeholder="Enter amount" required>
+            </div>
+            
+            <!-- Other Expenses -->
+            <div class="form-group">
+                <label>Do you have any other monthly expenses?</label>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="otherExpensesCheck" name="otherExpensesCheck">
+                    <label for="otherExpensesCheck" style="margin-bottom: 0;">Yes, I have other expenses</label>
+                </div>
+                <div id="otherExpensesInput" class="conditional-input">
+                    <label for="otherExpenses">Enter the amount:</label>
+                    <input type="number" id="otherExpenses" name="otherExpenses" placeholder="Enter amount">
+                </div>
+            </div>
+            
+            <!-- Monthly Savings -->
+            <div class="form-group">
+                <label for="monthlySavings">How much money do you save every month? <span class="required">*</span></label>
+                <input type="number" id="monthlySavings" name="monthlySavings" placeholder="Enter amount" required>
+            </div>
+            
+            <!-- Saving Goal -->
+            <div class="form-group">
+                <label for="savingGoal">What is your saving goal? <span class="required">*</span></label>
+                <input type="text" id="savingGoal" name="savingGoal" placeholder="Example: Gold, Household appliance, Trip, Emergency fund" required>
+            </div>
+            
+            <!-- Submit Button -->
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+    
+    <script>
+        // Show/hide other expenses input
+        const otherExpensesCheckbox = document.getElementById('otherExpensesCheck');
+        const otherExpensesInput = document.getElementById('otherExpensesInput');
+        
+        otherExpensesCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                otherExpensesInput.classList.add('show');
+            } else {
+                otherExpensesInput.classList.remove('show');
+                document.getElementById('otherExpenses').value = '';
+            }
+        });
+        
+        // Form submission
+        document.getElementById('budgetForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Form submitted successfully!');
+            // You can add code here to send the form data to a server
+        });
+    </script>
+</body>
+</html>
