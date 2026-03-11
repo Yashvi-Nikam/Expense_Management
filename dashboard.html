@@ -15,12 +15,58 @@
 
 <button class="menuBtn" onclick="toggleMenu()">☰</button>
 
+<!-- TOP BAR (NEW) -->
+
+<div class="topbar">
+
+<div class="leftTop">
+<h1 class="welcomeText">Welcome, User</h1>
+</div>
+
+<div class="top-right">
+
+<!-- SEARCH BAR -->
+
+<div class="search-container">
+
+<input type="text" id="searchInput" placeholder="Search here">
+
+<button onclick="triggerSearch()">
+🔍
+</button>
+
+</div>
+
+<!-- PROFILE MENU -->
+
+<div class="profile-container">
+
+    <!-- PROFILE AVATAR -->
+    <div class="profileBox small" onclick="toggleProfileMenu()">
+        <span id="topInitials">YN</span>
+        <img id="topProfilePhoto" style="display:none;">
+    </div>
+
+    <!-- DROPDOWN MENU -->
+    <div id="profileMenu" class="profileMenu">
+        <button onclick="openPage('userInfo.php')">Profile</button>
+        <button onclick="logout()">Logout</button>
+    </div>
+
+</div>
+
+</div>
+</div>
+
+
 <!-- SIDEBAR -->
 
 <div id="sidebar" class="sidebar">
 
 <input type="file" id="photoUpload" accept="image/*">
-<img id="profilePhoto" class="profile" src="default.png">
+
+ <span id="profileInitials">YN</span>
+ <img id="profilePhoto" class="profile" src="" style="display:none;">
 
 <button onclick="openPage('userInfo.php')">User Info</button>
 <button onclick="openPage('expenseHistory.php')">Expense History</button>
@@ -45,8 +91,6 @@
 <!-- MAIN DASHBOARD -->
 
 <div class="main">
-
-<h1>Welcome, User</h1>
 
 <div class="summary">
 

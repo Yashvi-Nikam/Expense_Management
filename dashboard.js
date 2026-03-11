@@ -20,6 +20,7 @@ overlay.style.display = "block";
 
 }
 
+
 // SETTINGS SUBMENU
 
 function toggleSettings(){
@@ -35,17 +36,20 @@ menu.style.display = "block";
 
 }
 
+
 // PAGE NAVIGATION
 
 function openPage(page){
 window.location.href = page;
 }
 
+
 // LOGOUT
 
 function logout(){
 window.location.href = "index.html";
 }
+
 
 // DELETE ACCOUNT
 
@@ -59,10 +63,14 @@ alert("Account will be deleted later with PHP.");
 
 }
 
+
 // PHOTO UPLOAD
 
 const upload = document.getElementById("photoUpload");
 const photo = document.getElementById("profilePhoto");
+const topPhoto = document.getElementById("topProfilePhoto");
+const initials = document.getElementById("profileInitials");
+const topInitials = document.getElementById("topInitials");
 
 upload.addEventListener("change", function(){
 
@@ -73,7 +81,19 @@ if(file){
 const reader = new FileReader();
 
 reader.onload = function(e){
+
 photo.src = e.target.result;
+photo.style.display = "block";
+initials.style.display = "none";
+
+/* SYNC TOP PROFILE PHOTO */
+
+if(topPhoto){
+topPhoto.src = e.target.result;
+topPhoto.style.display = "block";
+topInitials.style.display = "none";
+}
+
 }
 
 reader.readAsDataURL(file);
@@ -86,9 +106,78 @@ upload.style.display = "none";
 
 });
 
+
 photo.addEventListener("click", function(){
 upload.style.display = "block";
 });
+
+
+// PROFILE DROPDOWN (TOP RIGHT)
+
+function toggleProfileMenu(){
+
+let menu = document.getElementById("profileMenu");
+
+if(menu.style.display === "block"){
+menu.style.display = "none";
+}
+else{
+menu.style.display = "block";
+}
+
+}
+
+
+// SEARCH FUNCTION (OPEN SIDEBAR IF MATCH)
+
+function triggerSearch(){
+
+let value = document.getElementById("searchInput").value.toLowerCase();
+
+let sidebar = document.getElementById("sidebar");
+let overlay = document.getElementById("overlay");
+
+let keywords = [
+"user info",
+"expense",
+"expense history",
+"monthly",
+"monthly report",
+"settings",
+"reset password",
+"delete account",
+"logout"
+];
+
+let found = keywords.some(function(word){
+return value.includes(word);
+});
+
+if(found){
+
+sidebar.classList.add("open");
+overlay.style.display = "block";
+
+}
+else{
+
+alert("No result found");
+
+}
+
+}
+
+
+// ENTER KEY SUPPORT
+
+document.getElementById("searchInput").addEventListener("keypress", function(e){
+
+if(e.key === "Enter"){
+triggerSearch();
+}
+
+});
+
 
 // PIE CHART
 
@@ -100,7 +189,6 @@ data:{
 labels:["Food","Travel","Shopping","Bills"],
 datasets:[{
 data:[5000,3000,2000,4000]
-
 }]
 },
 options:{
@@ -109,6 +197,7 @@ maintainAspectRatio:false
 }
 }
 );
+
 
 // HORIZONTAL BAR CHART
 
@@ -121,7 +210,6 @@ labels:["Income","Expense"],
 datasets:[{
 label:"Amount",
 data:[50000,30000]
-
 }]
 },
 options:{

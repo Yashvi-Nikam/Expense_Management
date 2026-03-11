@@ -7,8 +7,100 @@
 body{
 font-family:'Poppins', sans-serif;
 margin:0;
-background:#2cca96; /* soft bluish background */
+background:#2cca96;
 color:#1f2937;
+}
+
+/* TOP BAR */
+
+.topbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:10px 25px;
+background:white;
+box-shadow:0 3px 10px rgba(0,0,0,0.08);
+position:sticky;
+top:0;
+z-index:2;
+}
+
+.welcomeText{
+font-size:24px;
+font-weight:600;
+}
+
+.top-right{
+display:flex;
+align-items:center;
+gap:20px;
+}
+
+/* SEARCH BAR */
+
+.search-container{
+display:flex;
+align-items:center;
+background:#f3f4f6;
+padding:5px 12px;
+border-radius:20px;
+}
+
+.search-container input{
+border:none;
+background:transparent;
+outline:none;
+padding:6px;
+font-size:14px;
+width:160px;
+}
+
+.search-container button{
+border:none;
+background:none;
+cursor:pointer;
+font-size:16px;
+}
+
+/* PROFILE ICON */
+
+.profile-icon{
+width:36px;
+height:36px;
+border-radius:50%;
+cursor:pointer;
+object-fit:cover;
+}
+
+/* PROFILE MENU */
+
+.profile-container{
+position:relative;
+}
+
+.profile-menu{
+display:none;
+position:absolute;
+right:0;
+top:45px;
+background:white;
+border-radius:8px;
+box-shadow:0 10px 25px rgba(0,0,0,0.15);
+width:130px;
+overflow:hidden;
+}
+
+.profile-menu button{
+width:100%;
+border:none;
+background:white;
+padding:10px;
+cursor:pointer;
+font-size:14px;
+}
+
+.profile-menu button:hover{
+background:#f3f4f6;
 }
 
 /* MENU BUTTON */
@@ -112,12 +204,13 @@ margin-top:10px;
 
 .card{
 background:white;
-padding:20px;
+padding:25px;
 flex:1;
 border-radius:14px;
 box-shadow:0 10px 25px rgba(0,0,0,0.08);
 text-align:center;
 transition:0.2s;
+min-height:120px;
 }
 
 /* CARD HOVER */
@@ -133,7 +226,7 @@ font-weight:500;
 }
 
 .card p{
-font-size:22px;
+font-size:24px;
 font-weight:600;
 }
 
@@ -150,7 +243,7 @@ background:white;
 padding:20px;
 border-radius:14px;
 flex:1;
-height:320px;
+height:360px;
 box-shadow:0 10px 25px rgba(0,0,0,0.08);
 display:flex;
 flex-direction:column;
@@ -160,7 +253,7 @@ justify-content:center;
 
 canvas{
 max-width:100%;
-max-height:220px
+max-height:260px
 }
 
 /* PROGRESS BAR */
@@ -240,4 +333,49 @@ height:100%;
 background:rgba(0,0,0,0.25);
 display:none;
 z-index:5;
+}
+
+/* SEARCH PLACEHOLDER */
+
+#searchInput::placeholder{
+color:#999;
+}
+
+.profileBox{
+width:90px;
+height:90px;
+border-radius:50%;
+background:#4f46e5;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:600;
+color:white;
+font-size:26px;
+overflow:hidden;
+cursor:pointer;
+}
+
+.profileBox.small{
+width:40px;
+height:40px;
+font-size:14px;
+}
+
+.profileBox img{
+width:100%;
+height:100%;
+object-fit:cover;
+border-radius:50%;
+}
+
+#profileMenu{
+display:none;
+position:absolute;
+right:20px;
+top:60px;
+background:white;
+padding:10px;
+border-radius:10px;
+box-shadow:0 8px 20px rgba(0,0,0,0.15);
 }
