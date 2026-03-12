@@ -12,20 +12,20 @@
 
 <h1 class="title">Basic Information</h1>
 
-<form id="generalForm">
+<form id="generalForm" action="basicinfoform.php" method="post">
 
 <label>Full Name</label>
-<input type="text" placeholder="Enter your name" required>
+<input type="text" placeholder="Enter your name" name="name" required>
 
 <label>Age</label>
-<input type="number" placeholder="Enter your age" required>
+<input type="number" placeholder="Enter your age" name="age" min="12" max="100" required>
 
 <label>Gender</label>
-<select required>
+<select name="gender" required>
 <option value="">Select</option>
 <option value="male">Male</option>
-<option>Female</option>
-<option>Other</option>
+<option value="female">Female</option>
+<option value="other">Other</option>
 </select>
 <br>
 <label>Occupation</label>
@@ -63,41 +63,3 @@
 </body>
 </html>
 
-<script>
-
-document.getElementById("generalForm").addEventListener("submit", function(e) {
-
-e.preventDefault();
-
-let selected = document.querySelector('input[name="occupation"]:checked');
-
-if(!selected){
-alert("Please select your occupation");
-return;
-}
-
-let occupation = selected.value;
-
-if (occupation === "student") {
-window.location.href = "student_form.html";
-}
-
-else if (occupation === "employed") {
-window.location.href = "employed_form.html";
-}
-
-else if (occupation === "unemployed") {
-window.location.href = "unemployed_form.html";
-}
-
-else if (occupation === "housewife") {
-window.location.href = "housewife_form.html";
-}
-
-else if (occupation === "self-employed") {
-window.location.href = "selfemployed_form.html";
-}
-
-});
-
-</script>
