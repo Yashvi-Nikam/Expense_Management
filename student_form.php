@@ -119,6 +119,6 @@ SUCCESS MESSAGE
 ---------------------------*/
 echo "<script>
 alert('Student details saved successfully!');
-window.location.href='dashboard.html';
+window.location.href='dashboard.php';
 </script>";
 ?>

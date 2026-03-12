@@ -395,3 +395,15 @@ border-radius:6px;
 .profileMenu button:hover{
 background:#f3f4f6;
 }
+
+.chart-container {
+    display: flex;
+    gap: 20px;        /* space between charts */
+    flex-wrap: wrap;   /* wrap on small screens */
+}
+
+.chart-box {
+    flex: 1;           /* equal width */
+    min-width: 300px;  /* prevents charts from shrinking too much */
+    height: 350px;     /* chart height */
+}

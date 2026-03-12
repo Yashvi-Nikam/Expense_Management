@@ -181,22 +181,36 @@ triggerSearch();
 
 // PIE CHART
 
-new Chart(
-document.getElementById("pieChart"),
-{
-type:"pie",
-data:{
-labels:["Food","Travel","Shopping","Bills"],
-datasets:[{
-data:[5000,3000,2000,4000]
-}]
-},
-options:{
-responsive:true,
-maintainAspectRatio:false
-}
-}
-);
+new Chart(document.getElementById('pieChart'), {
+    type: 'pie',
+    data: {
+        labels: pieLabels,
+        datasets: [{
+            data: pieData,
+            backgroundColor: [
+                '#FF6384', '#36A2EB', '#FFCE56', '#8A2BE2', 
+                '#00FF7F', '#FFA500', '#00CED1', '#FF69B4'
+            ]
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'right',      // moves legend to right side
+                align: 'start',         // aligns legend vertically at top
+                labels: {
+                    boxWidth: 20,       // size of color box
+                    padding: 10         // space between items
+                }
+            },
+            tooltip: {
+                enabled: true           // keeps tooltips on hover
+            }
+        }
+    }
+});
 
 
 // HORIZONTAL BAR CHART
