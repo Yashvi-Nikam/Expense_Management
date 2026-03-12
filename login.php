@@ -7,10 +7,12 @@ $sql = "SELECT * FROM users WHERE (username='$login' OR email='$login')
 $result = mysqli_query($conn,$sql);
 if(mysqli_num_rows($result) == 1)
 {
-    echo "Login Successful";
+    header("Location: dashboard.html");
+    exit();
 }
 else
 {
     echo "Invalid Username/Email or Password";
 }
+
 ?>
