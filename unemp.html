@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Unemployed Expense Form</title>
+<script>
+
+function validateUnemployed(){
+
+let budget = document.getElementById("budget").value;
+let food = document.getElementById("food").value;
+let transport = document.getElementById("transport").value;
+let internet = document.getElementById("internet").value;
+let saving = document.getElementById("saving").value;
+if(isNaN(budget)){
+alert("Please enter numbers only in Budget.");
+return false;
+}
+if(isNaN(food)){
+alert("Please enter numbers only in Food Expense.");
+return false;
+}
+if(isNaN(transport)){
+alert("Please enter numbers only in Transport Expense.");
+return false;
+}
+if(isNaN(internet)){
+alert("Please enter numbers only in Mobile / Internet Expense.");
+return false;
+}
+if(isNaN(saving)){
+alert("Please enter numbers only in Monthly Saving Amount.");
+return false;
+}
+alert("Form Submitted Successfully!");
+setTimeout(function(){
+window.location.href="dashboard.html";
+},2000);
+return false;
+}
+</script>
+<style>
+body{
+    font-family: Arial;
+    background:#f5f5f5;
+}
+.container{
+    width:420px;
+    margin:auto;
+    margin-top:40px;
+    background:white;
+    padding:25px;
+    border-radius:10px;
+}
+input, select{
+    width:100%;
+    padding:8px;
+    margin:8px 0;
+}
+button{
+    width:100%;
+    padding:10px;
+    background:#007BFF;
+    color:white;
+    border:none;
+}
+</style>
+</head>
+<body>
+<div class="container">
+<h2>Unemployed Expense Form</h2>
+<form  action="unemp.php" method="post" onsubmit="return validateUnemployed()">
+<label>Full Name</label>
+<input type="text" name="name" required>
+<label>Source of Money</label>
+<select name="source">
+<option>Family Support</option>
+<option>Savings</option>
+<option>Freelancing</option>
+<option>Other</option>
+</select>
+<label>Monthly Available Budget</label>
+<input type="text" id="budget" name="budget" required>
+<h3>Monthly Expenses</h3>
+<label>Food Expense</label>
+<input type="text" id="food" name="food_expense">
+<label>Transport Expense</label>
+<input type="text" name="transport_expense" required>
+<label>Mobile / Internet</label>
+<input type="text" id="internet" name="internet_expense" required>
+<label>Learning / Job Search Expense</label>
+<input type="text" name="learning_expense">
+<label>Other Expenses</label>
+<input type="text" name="other_expense">
+<label>Monthly Saving Amount</label>
+<input type="text" id="saving" name="saving" required>
+<label>Saving Goal</label>
+<input type="text" name="goal">
+<button type="submit">Submit</button>
+</form>
+</div>
+</body>
+</html>
