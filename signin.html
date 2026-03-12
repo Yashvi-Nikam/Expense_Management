@@ -113,16 +113,16 @@ body{
 <body>
 <div class="login-container">
 <h2>Here For Login We Got You!!</h2>
-<form action="dashboard.html" method="get">
+<form action="login.php" method="post">
 <label for="Username">Username/Email</label>
-<input type="text" id="Username" class="input-box" placeholder="Username or Email" required>
+<input type="text" id="Username" name="login"class="input-box" placeholder="Username or Email" required>
 <label for="password">Password</label>
-<input type="password" id="password"class="input-box" placeholder="Password" required>
+<input type="password" id="password" name="password" class="input-box" placeholder="Password" required>
 <div class="actions">
   <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:black"><input type="checkbox" name="remember" /> Remember me</label>
   <a href="forget_password.html" class="small">Forgot password?</a>
 </div>
-<button class="login-btn">Login</button>
+<button href="dashboard.html" class="login-btn">Login</button>
 </form>
 <div class="divider">OR</div>
 <button class="google-btn" >
