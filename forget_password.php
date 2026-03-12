@@ -1,16 +1,25 @@
 <?php
+
+session_start();
 include("db_connect.php");
-$email = $_POST['email'];
-$sql = "SELECT * FROM users WHERE email='$email'";
+
+$username = $_POST['username'];
+
+$sql = "SELECT * FROM users WHERE username='$username'";
 $result = mysqli_query($conn,$sql);
+
 if(mysqli_num_rows($result) == 1)
 {
-  header("Location: reset_password.html");
-  exit();
+    $user = mysqli_fetch_assoc($result);
 
+    $_SESSION['reset_user_id'] = $user['user_id'];
+
+    header("Location: reset_password.html");
+    exit();
 }
 else
 {
-    echo "Email not found";
+    echo "User not found";
 }
+
 ?>

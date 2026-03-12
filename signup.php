@@ -22,7 +22,7 @@ if(isset($_POST['username']) && isset($_POST['password'])){
         $_SESSION['user_id'] = $user_id;
 
         // redirect to basic details page
-        echo "<script>alert('Account created successfully! Please fill in your basic details.');</script>";
+    
         header("Location: basicinfoform.html");
         exit();
 

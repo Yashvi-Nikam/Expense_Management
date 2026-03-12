@@ -2,7 +2,13 @@
 session_start();
 require 'db_connect.php';
 
-$user_id = $_SESSION['user_id'] ?? 1;
+
+if(!isset($_SESSION['user_id'])){
+    header("Location: index.html");
+    exit();
+}
+
+$user_id = $_SESSION['user_id'];
 
 /* USER NAME */
 $userQuery = $conn->prepare("SELECT name FROM users WHERE user_id=?");
