@@ -2,19 +2,25 @@
 session_start();
 require 'db_connect.php';
 
-$user_id = $_SESSION['user_id'] ?? 0;
+if(!isset($_SESSION['user_id'])){
+    echo "User not logged in.";
+    exit();
+}
 
-if($user_id){
-    $stmt = $conn->prepare("DELETE FROM users WHERE id = ?");
-    $stmt->bind_param("i", $user_id);
-    $stmt->execute();
+$user_id = $_SESSION['user_id'];
+
+$stmt = $conn->prepare("DELETE FROM users WHERE user_id = ?");
+$stmt->bind_param("i", $user_id);
+
+if($stmt->execute()){
 
     session_unset();
     session_destroy();
 
-    header("Location: index.html");
+    header("Location: index.html?deleted=1");
     exit();
-} else {
-    echo "User not found.";
+
+}else{
+    echo "Error deleting account.";
 }
 ?>
