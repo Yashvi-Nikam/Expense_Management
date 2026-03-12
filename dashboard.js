@@ -220,22 +220,24 @@ alert("🎉 Congratulations! You reached your savings goal!");
 
 sessionStorage.setItem("goalShown","true");
 
-window.location.href="thank_you.html";
+window.location.href="thank_you.php";
 
 }
 
 
 /* ---------------- EDIT PROMPT ---------------- */
 
-if(savingsPercent < 100){
+if(!sessionStorage.getItem("editPromptShown")){
 
 setTimeout(function(){
 
-let edit=confirm("Do you want to edit something?");
+let edit = confirm("Do you want to edit something?");
 
 if(edit){
 window.location.href="userInfo.php";
 }
+
+sessionStorage.setItem("editPromptShown","true");
 
 },1500);
 
@@ -244,12 +246,24 @@ window.location.href="userInfo.php";
 
 /* ---------------- MONTH END REPORT ---------------- */
 
-let today=new Date();
-let lastDay=new Date(today.getFullYear(),today.getMonth()+1,0).getDate();
+let today = new Date();
+let lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
 
-if(today.getDate()===lastDay){
+/* run only on last day of month and only once per session */
 
-alert("Your monthly report is ready!");
+if(today.getDate() === lastDay && !sessionStorage.getItem("monthlyReportShown")){
+ 
+setTimeout(function(){
+
+let report = confirm("Your monthly report is ready! Do you want to view or edit something?");
+
+if(report){
+toggleMenu();   // opens your sidebar slider
+}
+
+sessionStorage.setItem("monthlyReportShown","true");
+
+},3000);
 
 }
 

@@ -58,7 +58,7 @@ while($row=$r->fetch_assoc()){
 $categories[]=$row['field_name'];
 $amounts[]=$row['total'];
 }
-
+ 
 /* MONTHLY */
 $transactions=[];
 $month=date('m');
