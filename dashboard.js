@@ -58,7 +58,7 @@ function deleteAccount(){
 let confirmDelete = confirm("Are you sure you want to delete your account?");
 
 if(confirmDelete){
-alert("Account will be deleted later with PHP.");
+ window.location.href = 'delete_account.php';
 }
 
 }
@@ -233,3 +233,23 @@ maintainAspectRatio:false
 }
 }
 );
+
+if(!sessionStorage.getItem('monthlyPromptShown')){
+    if(confirm("Your monthly report is going to be generated. Do you want to edit something now?")){
+        window.location.href = 'userInfo.php';
+    } else {
+        window.location.href = 'monthlyReport.php';
+    }
+    sessionStorage.setItem('monthlyPromptShown', 'true');
+}
+
+if(!sessionStorage.getItem('welcomeBackShown')){
+    alert("👋 Welcome back! Do you want to edit something more?");
+    sessionStorage.setItem('welcomeBackShown', 'true');
+}
+
+const savingsPercent = <?php echo round($percent); ?>;
+if(savingsPercent >= 100){
+    alert("🎉 Congratulations! You've reached your savings goal!");
+    window.location.href = 'thank_you.php';
+}

@@ -117,7 +117,7 @@ while($row = $transResult->fetch_assoc()){
 
       <div id="profileMenu" class="profileMenu">
         <button onclick="openPage('userInfo.php')">Profile</button>
-        <button onclick="logout()">Logout</button>
+        <button onclick="window.location.href='logout.php'">Logout</button>
       </div>
     </div>
   </div>
@@ -136,10 +136,10 @@ while($row = $transResult->fetch_assoc()){
   <button onclick="toggleSettings()">Settings</button>
   <div id="settingsMenu" class="submenu">
     <button onclick="openPage('reset_password.html')">Reset Password</button>
-    <button onclick="deleteAccount()">Delete Account</button>
+    <button onclick="window.location.href='delete_account.php'">Delete Account</button>
   </div>
 
-  <button onclick="logout()">Logout</button>
+  <button onclick="window.location.href='logout.php'">Logout</button>
 </div>
 
 <div id="overlay" onclick="toggleMenu()"></div>
