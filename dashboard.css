@@ -407,3 +407,4 @@ background:#f3f4f6;
     min-width: 300px;  /* prevents charts from shrinking too much */
     height: 350px;     /* chart height */
 }
+#savingsData { display: none; }

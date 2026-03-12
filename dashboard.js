@@ -248,8 +248,11 @@ if(!sessionStorage.getItem('welcomeBackShown')){
     sessionStorage.setItem('welcomeBackShown', 'true');
 }
 
-const savingsPercent = <?php echo round($percent); ?>;
-if(savingsPercent >= 100){
-    alert("🎉 Congratulations! You've reached your savings goal!");
-    window.location.href = 'thank_you.php';
+const savingsDiv = document.getElementById('savingsData');
+const savingsPercent = Number(savingsDiv.dataset.percent);
+
+if (savingsPercent >= 100) {
+    // Replace alert with your card-based thank-you screen if you like
+    alert(`🎉 Congratulations! You've reached your savings goal of ${savingsPercent}%!`);
+    window.location.href = 'thank_you.php'; // optional, only if you want a separate page
 }

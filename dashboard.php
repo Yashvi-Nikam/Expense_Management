@@ -163,6 +163,9 @@ while($row = $transResult->fetch_assoc()){
     </div>
   </div>
 
+  <!-- PASS SAVINGS PERCENT TO JS -->
+<div id="savingsData" data-percent="<?php echo round($percent); ?>"></div>
+
   <!-- Charts -->
   <div class="chart-container">
     <div class="chart-box">
