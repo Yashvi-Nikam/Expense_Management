@@ -104,6 +104,44 @@ box-shadow:0 5px 15px rgba(0,0,0,0.2);
 transition:top 0.8s ease;
 z-index:9999;
 }
+.card {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    max-width: 500px;
+    text-align: center;
+    transition: box-shadow 1s ease-in-out;
+    animation: glow 2s infinite alternate;
+}
+
+@keyframes glow {
+    0% {
+        box-shadow: 0 0 20px rgba(79,70,229,0.4), 0 0 40px rgba(79,70,229,0.2);
+    }
+    100% {
+        box-shadow: 0 0 30px rgba(79,70,229,0.8), 0 0 60px rgba(79,70,229,0.4);
+    }
+}
+
+.coin {
+    position: fixed;
+    width: 25px;
+    height: 25px;
+    background: gold;
+    border-radius: 50%;
+    top: -50px;
+    left: 50%;
+    opacity: 0.9;
+    animation: fall 4s linear infinite;
+    box-shadow: 0 0 5px rgba(0,0,0,0.3);
+}
+
+@keyframes fall {
+    0% { transform: translateY(0) rotate(0deg); }
+    100% { transform: translateY(600px) rotate(360deg); }
+}
+
 </style>
 </head>
 
@@ -175,6 +213,20 @@ requestAnimationFrame(frame);
 
 })();
 
+}
+
+// Auto redirect after 5 seconds
+setTimeout(function(){
+    window.location.href = 'dashboard.php';
+}, 5000);
+
+// Create 10 coins
+for(let i=0;i<10;i++){
+    let coin = document.createElement('div');
+    coin.classList.add('coin');
+    coin.style.left = Math.random() * window.innerWidth + 'px';
+    coin.style.animationDuration = (3 + Math.random()*2) + 's';
+    document.body.appendChild(coin);
 }
 
 </script>

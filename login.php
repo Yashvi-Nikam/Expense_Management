@@ -1,13 +1,7 @@
+
 <?php
 session_start();
 include("db_connect.php");
-if(!isset($_SESSION['user_id'])){
-    echo "<script>
-    alert('User not logged in');
-    window.location.href='signin.html';
-    </script>";
-    exit();
-}
 
 if(isset($_POST['login']) && isset($_POST['password'])){
 
@@ -42,5 +36,4 @@ if(isset($_POST['login']) && isset($_POST['password'])){
     echo "Please fill all fields.";
 }
 print_r($_POST);
-
 ?>
