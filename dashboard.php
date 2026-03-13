@@ -40,6 +40,11 @@ $goal_amount=$g['goal_amount'] ?? 0;
 $percent = $goal_amount>0 ? ($savings_amount/$goal_amount)*100 : 0;
 $percent = round($percent);
 
+/* LIMIT PROGRESS TO 100% */
+if($percent > 100){
+    $percent = 100;
+}
+
 /* PIE DATA */
 $categories=[];
 $amounts=[];
