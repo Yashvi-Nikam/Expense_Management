@@ -2,6 +2,14 @@
 
 session_start();
 include("db_connect.php");
+session_start();
+if(!isset($_SESSION['user_id'])){
+    echo "<script>
+    alert('User not logged in');
+    window.location.href='signin.html';
+    </script>";
+    exit();
+}
 
 $username = $_POST['username'];
 
@@ -21,5 +29,6 @@ else
 {
     echo "User not found";
 }
+
 
 ?>
