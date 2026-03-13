@@ -83,7 +83,7 @@ button{
 <body>
 <div class="container">
 <h2>Self Employed Expense Form</h2>
-<form onsubmit="return validateSelf()
+<form action="self.php" method="post" onsubmit="return validateSelf()
 " action="dashboard.html" method="get">
 <label>Full Name</label>
 <input type="text" name="name"  required>
@@ -93,20 +93,20 @@ button{
 <input type="text" id="income" name="income" required>
 <h3>Business Expenses</h3>
 <label>Shop / Office Rent</label>
-<input type="text" id="rent" name="rent">
+<input type="text" id="rent" name="rent_expense">
 <label>Raw Materials / Supplies</label>
-<input type="text" id="materials" name="materials" required>
+<input type="text" id="materials" name="materials_expense" required>
 <label>Staff Salary</label>
-<input type="text" id="salary" name="salary" required>
+<input type="text" id="salary" name="salary_expense" required>
 <label>Electricity / Internet</label>
-<input type="text" id="electricity" name="utilities">
+<input type="text" id="electricity" name="utilities_expense">
 <h3>Personal Expenses</h3>
 <label>Food / Grocery</label>
-<input type="text"  id="food" name="food" required>
+<input type="text"  id="food" name="food_expense" required>
 <label>Transport</label>
-<input type="text" id="transport" name="transport" required>
+<input type="text" id="transport" name="transport_expense" required>
 <label>Other Expenses</label>
-<input type="text" name="other">
+<input type="text" name="other_expense">
 <label>Monthly Saving Amount</label>
 <input type="text" id="saving" name="saving" required>
 <label>Saving Goal</label>
