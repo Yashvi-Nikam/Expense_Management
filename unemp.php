@@ -1,15 +1,22 @@
 <?php
+
 session_start();
 include("db_connect.php");
-// Check if user logged in
+
+/* --------------------------
+CHECK LOGIN
+---------------------------*/
+
 if(!isset($_SESSION['user_id'])){
-    echo "<script>
-    alert('User not logged in');
-    window.location.href='signin.html';
-    </script>";
-    exit();
+echo "<script>
+alert('User not logged in');
+window.location.href='signin.html';
+</script>";
+exit();
 }
+
 $user_id = $_SESSION['user_id'];
+
 
 /* --------------------------
 GET FORM VALUES
@@ -29,58 +36,115 @@ $learning_expense = isset($_POST['learning_expense']) ? floatval($_POST['learnin
 
 $other_expense = isset($_POST['other_expense']) ? floatval($_POST['other_expense']) : 0;
 
-$saving = isset($_POST['saving']) ? floatval($_POST['saving']) : 0;
+$user_saving_goal = isset($_POST['saving']) ? floatval($_POST['saving']) : 0;
 
 $goal = isset($_POST['goal']) ? $_POST['goal'] : '';
- //date and <month></month>
- $current_month = date('n'); 
- $current_year = date('Y');
-/*check if already submitted*/
- $check = mysqli_query($conn, "SELECT * FROM goals WHERE user_id='$user_id' AND start_month='$current_month' AND start_year='$current_year'");
+
+
+/* --------------------------
+CURRENT MONTH & YEAR
+---------------------------*/
+
+$current_month = date('n');
+$current_year = date('Y');
+
+
+/* --------------------------
+CHECK DUPLICATE SUBMISSION
+---------------------------*/
+
+$check = mysqli_query($conn,
+"SELECT * FROM goals
+WHERE user_id='$user_id'
+AND start_month='$current_month'
+AND start_year='$current_year'");
+
 if(mysqli_num_rows($check) > 0){
-    echo "<script>
-        alert('You have already submitted your details for this month. Use Edit option in dashboard to modify.');
-        window.location.href='dashboard.html';
-        </script>";
-    exit();
+
+echo "<script>
+alert('You have already submitted details for this month.');
+window.location.href='dashboard.php';
+</script>";
+exit();
+
 }
+
+
 /* --------------------------
 CALCULATIONS
 ---------------------------*/
 
-$total_expense = $food_expense + $transport_expense + $internet_expense + $learning_expense + $other_expense;
+$total_expense =
+$food_expense +
+$transport_expense +
+$internet_expense +
+$learning_expense +
+$other_expense;
 
 $calculated_saving = $budget - $total_expense;
 
+
 /* --------------------------
-CHECK SAVINGS
+STORE OCCUPATION DETAILS
 ---------------------------*/
 
-if(abs($saving - $calculated_saving) > 0.01){
-    echo "<script>
-    alert('Your saving amount does not match the calculated value.');
-    window.history.back();
-    </script>";
-    exit();
+$fields = [
+
+'income_source' => $income_source,
+'budget' => $budget,
+
+'food_expense' => $food_expense,
+'transport_expense' => $transport_expense,
+'internet_expense' => $internet_expense,
+'learning_expense' => $learning_expense,
+'other_expense' => $other_expense,
+
+'monthly_saving' => $calculated_saving,
+'goal' => $goal
+
+];
+
+foreach($fields as $name => $value){
+
+$value_str = mysqli_real_escape_string($conn, strval($value));
+
+mysqli_query($conn,
+"INSERT INTO occupation_details (user_id, field_name, field_value)
+VALUES ('$user_id','$name','$value_str')");
 }
 
+mysqli_query($conn,
+"INSERT INTO occupation_details (user_id,field_name,field_value)
+VALUES ('$user_id','$name','$value_str')");
+
+
+
+
 /* --------------------------
-STORE DATA
+STORE BUDGET AS INCOME
 ---------------------------*/
 
-mysqli_query($conn,"
-INSERT INTO unemployed_details
-(user_id,income_source,budget,food_expense,transport_expense,internet_expense,learning_expense,other_expense,saving,goal)
-VALUES
-('$user_id','$income_source','$budget','$food_expense','$transport_expense','$internet_expense','$learning_expense','$other_expense','$calculated_saving','$goal')
-");
+mysqli_query($conn,
+"INSERT INTO income (user_id,amount)
+VALUES ('$user_id','$budget')");
+
+
+/* --------------------------
+STORE EXPENSE
+---------------------------*/
+
+mysqli_query($conn,
+"INSERT INTO expenses (user_id,amount)
+VALUES ('$user_id','$total_expense')");
+
 
 /* --------------------------
 SUCCESS MESSAGE
 ---------------------------*/
 
 echo "<script>
-alert('Details saved successfully!');
-window.location.href='dashboard.html';
+alert('Unemployed details saved successfully!');
+window.location.href='dashboard.php';
 </script>";
+
 ?>

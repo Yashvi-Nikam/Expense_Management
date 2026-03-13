@@ -5,15 +5,67 @@
 <title>Student Expense Form</title>
 <link rel="stylesheet" href="formstyle.css">
 
-<style>
-  /* Inline warning style */
-  #savingWarning {
-    color: red;
-    font-size: 14px;
-    display: none;
-    margin-top: 5px;
-  }
-</style>
+<script>
+function validateStudent(){
+
+let pocket = document.getElementById("pocketMoney").value;
+let otherIncome = document.getElementById("otherIncome").value;
+let food = document.getElementById("foodExpense").value;
+let transport = document.getElementById("transportationExpense").value;
+let books = document.getElementById("booksExpense").value;
+let entertainment = document.getElementById("entertainmentExpense").value;
+let mobile = document.getElementById("mobileExpense").value;
+let otherExpense = document.getElementById("otherExpense").value;
+let goalAmount = document.getElementById("goalAmount").value;
+
+if(isNaN(pocket) || pocket < 0){
+alert("Please enter a valid number in Pocket Money.");
+return false;
+}
+
+if(isNaN(otherIncome) || otherIncome < 0){
+alert("Please enter a valid number in Other Income.");
+return false;
+}
+
+if(isNaN(food) || food < 0){
+alert("Please enter a valid number in Food Expense.");
+return false;
+}
+
+if(isNaN(transport) || transport < 0){
+alert("Please enter a valid number in Transportation Expense.");
+return false;
+}
+
+if(isNaN(books) || books < 0){
+alert("Please enter a valid number in Books Expense.");
+return false;
+}
+
+if(isNaN(entertainment) || entertainment < 0){
+alert("Please enter a valid number in Entertainment Expense.");
+return false;
+}
+
+if(isNaN(mobile) || mobile < 0){
+alert("Please enter a valid number in Mobile Expense.");
+return false;
+}
+
+if(isNaN(otherExpense) || otherExpense < 0){
+alert("Please enter a valid number in Other Expense.");
+return false;
+}
+
+if(isNaN(goalAmount) || goalAmount < 0){
+alert("Please enter a valid number in Goal Amount.");
+return false;
+}
+
+return true;
+}
+</script>
 
 </head>
 <body>
@@ -22,91 +74,57 @@
 
 <h1>Student Expense Details</h1><br><br>
 
-<form id="studentForm" action="student_form.php" method="post">
+<form id="studentForm" action="student_form.php" method="post" onsubmit="return validateStudent()">
 
-  <!-- Income Fields -->
-  <label>Monthly Pocket Money / Allowance</label>
-  <input type="number" name="pocket_money" id="pocketMoney" required>
+<!-- Income Fields -->
 
-  <label>Other Income (Optional)</label>
-  <input type="number" name="other_income" id="otherIncome" value="0">
+<label>Monthly Pocket Money / Allowance</label>
+<input type="text" name="pocket_money" id="pocketMoney" required>
 
-  <label>Main Source of Income</label>
-  <select name="income_source" required>
-    <option>Select</option>
-    <option>Parents</option>
-    <option>Scholarship</option>
-    <option>Part-time Job</option>
-  </select>
+<label>Other Income (Optional)</label>
+<input type="text" name="other_income" id="otherIncome" value="0">
 
-  <!-- Expense Fields -->
-  <label>Food / Mess Expense (per month)</label>
-  <input type="number" name="food_expense" id="foodExpense" required>
+<label>Main Source of Income</label>
+<select name="income_source" required>
+<option>Select</option>
+<option>Parents</option>
+<option>Scholarship</option>
+<option>Part-time Job</option>
+</select>
 
-  <label>Transportation Expense</label>
-  <input type="number" name="transportation_expense" id="transportationExpense" required>
+<!-- Expense Fields -->
 
-  <label>Books / Study Materials</label>
-  <input type="number" name="books_expense" id="booksExpense" required>
+<label>Food / Mess Expense (per month)</label>
+<input type="text" name="food_expense" id="foodExpense" required>
 
-  <label>Entertainment / Outings</label>
-  <input type="number" name="entertainment_expense" id="entertainmentExpense" required>
+<label>Transportation Expense</label>
+<input type="text" name="transportation_expense" id="transportationExpense" required>
 
-  <label>Mobile / Internet Recharge</label>
-  <input type="number" name="mobile_expense" id="mobileExpense" required>
+<label>Books / Study Materials</label>
+<input type="text" name="books_expense" id="booksExpense" required>
 
-  <label>Other Monthly Expenses</label>
-  <input type="number" name="other_expense" id="otherExpense" value="0">
+<label>Entertainment / Outings</label>
+<input type="text" name="entertainment_expense" id="entertainmentExpense" required>
 
-  <!-- Monthly Saving -->
-  <label>Monthly Savings</label>
-  <input type="number" name="savings" id="savingsInput" required>
-  <span id="savingWarning">Calculated monthly saving does not match your entry.</span>
+<label>Mobile / Internet Recharge</label>
+<input type="text" name="mobile_expense" id="mobileExpense" required>
 
-  <!-- Goal Fields -->
-  <label>Saving Goal (Laptop / Phone / Trip etc.)</label>
-  <input type="text" name="saving_goal" id="savingGoal" required>
+<label>Other Monthly Expenses</label>
+<input type="text" name="other_expense" id="otherExpense" value="0">
 
-  <label>Goals Amount</label>
-  <input type="number" name="goals_amount" id="goalAmount" required><br><br>
+<!-- Goal Fields -->
 
-  <button type="submit">Submit</button>
+<label>Saving Goal (Laptop / Phone / Trip etc.)</label>
+<input type="text" name="saving_goal" id="savingGoal" required>
+
+<label>Goals Amount</label>
+<input type="text" name="goals_amount" id="goalAmount" required><br><br>
+
+<button type="submit">Submit</button>
 
 </form>
 
 </div>
-
-<script>
-  const form = document.getElementById('studentForm');
-  const pocketMoney = document.getElementById('pocketMoney');
-  const otherIncome = document.getElementById('otherIncome');
-  const foodExpense = document.getElementById('foodExpense');
-  const transportationExpense = document.getElementById('transportationExpense');
-  const booksExpense = document.getElementById('booksExpense');
-  const entertainmentExpense = document.getElementById('entertainmentExpense');
-  const mobileExpense = document.getElementById('mobileExpense');
-  const otherExpense = document.getElementById('otherExpense');
-  const savingsInput = document.getElementById('savingsInput');
-  const savingWarning = document.getElementById('savingWarning');
-
-  form.addEventListener('submit', function(e){
-    // Calculate expected monthly saving
-    const totalIncome = parseFloat(pocketMoney.value || 0) + parseFloat(otherIncome.value || 0);
-    const totalExpense = parseFloat(foodExpense.value || 0) + parseFloat(transportationExpense.value || 0) +
-                         parseFloat(booksExpense.value || 0) + parseFloat(entertainmentExpense.value || 0) +
-                         parseFloat(mobileExpense.value || 0) + parseFloat(otherExpense.value || 0);
-    const calculatedSaving = totalIncome - totalExpense;
-    const userSaving = parseFloat(savingsInput.value || 0);
-
-    // Show warning if mismatch
-    if(Math.abs(calculatedSaving - userSaving) > 0.01){
-      e.preventDefault(); // prevent form submission
-      savingWarning.style.display = 'inline';
-    } else {
-      savingWarning.style.display = 'none';
-    }
-  });
-</script>
 
 </body>
 </html>

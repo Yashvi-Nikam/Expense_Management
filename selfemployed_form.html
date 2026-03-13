@@ -17,40 +17,36 @@ if(isNaN(income)){
 alert("Please enter numbers only in Monthly Income.");
 return false;
 }
-if(isNaN(rent))
+if(isNaN(rent) ||rent<0)
 {
-alert("Please enter numbers  in Rent.");
+alert("Please enter a valid number in Rent.");
 return false;
 }
-if(isNaN(materials)){
-alert("Please enter numbers  in Materials.");
+if(isNaN(materials) || materials < 0){
+alert("Please enter a valid number in Materials.");
 return false;
 }
-if(isNaN(salary)){
-alert("Please enter numbers  in Staff Salary.");
+if(isNaN(salary) || salary < 0){
+alert("Please enter a valid number in Staff Salary.");
 return false;
 }
-if(isNaN(electricity)){
-alert("Please enter numbers  in Electricity / Internet.");
+if(isNaN(electricity) || electricity < 0){
+alert("Please enter a valid number in Electricity / Internet.");
 return false;
 }
-if(isNaN(food)){
-alert("Please enter numbers in Food / Grocery.");
+if(isNaN(food) || food < 0){
+alert("Please enter a valid number in Food / Grocery.");
 return false;
 }
-if(isNaN(transport)){
-alert("Please enter numbers only in Transport.");
+if(isNaN(transport) || transport < 0){
+alert("Please enter a valid number in Transport.");
 return false;
 }
-if(isNaN(saving)){
-alert("Please enter numbers in Monthly Saving Amount.");
+if(isNaN(saving) || saving < 0){
+alert("Please enter a valid number in Monthly Saving Amount.");
 return false;
 }
-alert("Form Submitted Successfully!");
-setTimeout(function(){
-window.location.href="dashboard.html";
-},2000);
-return false;
+return true;
 }
 </script>
 <style>
@@ -83,8 +79,7 @@ button{
 <body>
 <div class="container">
 <h2>Self Employed Expense Form</h2>
-<form action="self.php" method="post" onsubmit="return validateSelf()
-" action="dashboard.html" method="get">
+<form action="selfemp.php" method="post" onsubmit="return validateSelf()">
 <label>Full Name</label>
 <input type="text" name="name"  required>
 <label>Business / Profession</label>
@@ -116,4 +111,3 @@ button{
 </div>
 </body>
 </html>
-

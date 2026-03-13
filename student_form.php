@@ -26,9 +26,6 @@ $entertainment_expense = isset($_POST['entertainment_expense']) ? floatval($_POS
 $mobile_expense = isset($_POST['mobile_expense']) ? floatval($_POST['mobile_expense']) : 0;
 $other_expense = isset($_POST['other_expense']) ? floatval($_POST['other_expense']) : 0;
 
-// Monthly savings entered by user
-$user_monthly_saving = isset($_POST['savings']) ? floatval($_POST['savings']) : 0;
-
 // Goal info
 $saving_goal = isset($_POST['saving_goal']) ? $_POST['saving_goal'] : '';
 $goal_amount = isset($_POST['goals_amount']) ? floatval($_POST['goals_amount']) : 0;
@@ -60,36 +57,22 @@ $total_expense = $food_expense + $transportation_expense + $books_expense + $ent
 $calculated_monthly_saving = $total_income - $total_expense;
 
 /* --------------------------
-CHECK USER ENTERED SAVINGS
----------------------------*/
-if(abs($user_monthly_saving - $calculated_monthly_saving) > 0.01){ // allow tiny floating difference
-    echo "<script>
-        alert('Your entered monthly savings ($user_monthly_saving) does not match the calculated value ($calculated_monthly_saving). Please correct it.');
-        window.history.back();
-        </script>";
-    exit();
-}
-
-/* --------------------------
 STORE OCCUPATION DETAILS
 ---------------------------*/
 $fields = [
     'main_income' => $main_income,
     'other_income' => $other_income,
-    'income_source' => $income_source, // VARCHAR
+    'income_source' => $income_source,
     'food_expense' => $food_expense,
     'transportation_expense' => $transportation_expense,
     'books_expense' => $books_expense,
     'entertainment_expense' => $entertainment_expense,
     'mobile_expense' => $mobile_expense,
     'other_expense' => $other_expense,
-    'monthly_saving' => $calculated_monthly_saving, // store calculated value
-    'saving_goal' => $saving_goal // VARCHAR
+    'saving_goal' => $saving_goal
 ];
 
-// Insert into occupation_details
 foreach($fields as $name => $value){
-    // Check if value is numeric or text
     if(is_numeric($value)){
         $value_str = floatval($value);
     } else {

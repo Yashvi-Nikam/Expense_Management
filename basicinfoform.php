@@ -37,7 +37,7 @@ if(mysqli_query($conn,$sql)){
     }
     elseif($occupation == "unemployed"){
         echo "<script>alert('Basic details saved successfully');
-        window.location.href='unemployed_form.html';</script>";
+        window.location.href='unemp.html';</script>";
     }
     elseif($occupation == "housewife"){
         echo "<script>alert('Basic details saved successfully');

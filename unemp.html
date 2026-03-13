@@ -11,31 +11,28 @@ let food = document.getElementById("food").value;
 let transport = document.getElementById("transport").value;
 let internet = document.getElementById("internet").value;
 let saving = document.getElementById("saving").value;
-if(isNaN(budget)){
-alert("Please enter numbers only in Budget.");
+if(isNaN(budget) || budget <= 0){
+alert("Please enter a valid number in Budget.");
 return false;
 }
-if(isNaN(food)){
-alert("Please enter numbers only in Food Expense.");
+if(isNaN(food) || food < 0){
+alert("Please enter a valid number in Food Expense.");
 return false;
 }
-if(isNaN(transport)){
-alert("Please enter numbers only in Transport Expense.");
+if(isNaN(transport) || transport < 0){
+alert("Please enter a valid number in Transport Expense.");
 return false;
 }
-if(isNaN(internet)){
-alert("Please enter numbers only in Mobile / Internet Expense.");
+if(isNaN(internet) || internet < 0){
+alert("Please enter a valid number in Mobile / Internet Expense.");
 return false;
 }
-if(isNaN(saving)){
-alert("Please enter numbers only in Monthly Saving Amount.");
+if(isNaN(saving) || saving < 0){
+alert("Please enter a valid number in Monthly Saving Amount.");
 return false;
 }
-alert("Form Submitted Successfully!");
-setTimeout(function(){
-window.location.href="dashboard.html";
-},2000);
-return false;
+
+return true;
 }
 </script>
 <style>
@@ -84,13 +81,13 @@ button{
 <label>Food Expense</label>
 <input type="text" id="food" name="food_expense">
 <label>Transport Expense</label>
-<input type="text" name="transport_expense" required>
+<input type="text" id="transport" name="transport_expense" required>
 <label>Mobile / Internet</label>
 <input type="text" id="internet" name="internet_expense" required>
 <label>Learning / Job Search Expense</label>
-<input type="text" name="learning_expense">
+<input type="text" id="learning" name="learning_expense">
 <label>Other Expenses</label>
-<input type="text" name="other_expense">
+<input type="text" id="other" name="other_expense">
 <label>Monthly Saving Amount</label>
 <input type="text" id="saving" name="saving" required>
 <label>Saving Goal</label>
