@@ -97,6 +97,7 @@ STORE GOALS
 mysqli_query($conn, "INSERT INTO goals (user_id, goal_purpose, goal_amount, savings_amount, start_month, start_year) 
 VALUES ('$user_id', '$saving_goal', '$goal_amount', '$calculated_monthly_saving', '$current_month', '$current_year')");
 
+
 /* --------------------------
 SUCCESS MESSAGE
 ---------------------------*/
