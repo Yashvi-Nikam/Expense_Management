@@ -7,12 +7,18 @@
 function validateUnemployed(){
 
 let budget = document.getElementById("budget").value;
+let extra_budget = document.getElementById("extra_budget").value;
 let food = document.getElementById("food").value;
 let transport = document.getElementById("transport").value;
 let internet = document.getElementById("internet").value;
+let other = document.getElementById("other").value;
 let saving = document.getElementById("saving").value;
 if(isNaN(budget) || budget <= 0){
 alert("Please enter a valid number in Budget.");
+return false;
+}
+if(isNaN(extra_budget) || extra_budget <= 0){
+alert("Please enter a valid number in Extra Budget.");
 return false;
 }
 if(isNaN(food) || food < 0){
@@ -25,6 +31,10 @@ return false;
 }
 if(isNaN(internet) || internet < 0){
 alert("Please enter a valid number in Mobile / Internet Expense.");
+return false;
+}
+if(isNaN(other) || other < 0){
+alert("Please enter a valid number in Other Expenses.");
 return false;
 }
 if(isNaN(saving) || saving < 0){

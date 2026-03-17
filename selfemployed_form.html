@@ -6,15 +6,21 @@
 function validateSelf()
 {
 let income = document.getElementById("income").value;
+let extra_income = document.getElementById("extra_income").value;
 let rent = document.getElementById("rent").value;
 let materials = document.getElementById("materials").value;
 let salary = document.getElementById("salary").value;
 let electricity = document.getElementById("electricity").value;
 let food = document.getElementById("food").value;
 let transport = document.getElementById("transport").value;
+let other = document.getElementById("other").value;
 let saving = document.getElementById("saving").value;
-if(isNaN(income)){
+if(isNaN(income) || income < 0){
 alert("Please enter numbers only in Monthly Income.");
+return false;
+}
+if(isNaN(extra_income) || extra_income < 0){
+alert("Please enter numbers only in Other Income.");
 return false;
 }
 if(isNaN(rent) ||rent<0)
@@ -40,6 +46,10 @@ return false;
 }
 if(isNaN(transport) || transport < 0){
 alert("Please enter a valid number in Transport.");
+return false;
+}
+if(isNaN(other) || other < 0){
+alert("Please enter a valid number in Other Expenses.");
 return false;
 }
 if(isNaN(saving) || saving < 0){
