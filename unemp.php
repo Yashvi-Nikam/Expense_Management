@@ -117,16 +117,20 @@ $fields = [
 
 foreach($fields as $name => $value){
 
-if(is_numeric($value)){
-$value_str = floatval($value);
-}else{
-$value_str = mysqli_real_escape_string($conn,$value);
-}
+    if(is_numeric($value)){
+        $value = floatval($value);
 
-mysqli_query($conn,
-"INSERT INTO occupation_details (user_id,field_name,field_value)
-VALUES ('$user_id','$name','$value_str')");
+        mysqli_query($conn,
+        "INSERT INTO occupation_details (user_id, field_name, field_value)
+        VALUES ('$user_id', '$name', '$value')");
 
+    } else {
+        $value = mysqli_real_escape_string($conn, $value);
+
+        mysqli_query($conn,
+        "INSERT INTO occupation_details (user_id, field_name, field_text)
+        VALUES ('$user_id', '$name', '$value')");
+    }
 }
 
 

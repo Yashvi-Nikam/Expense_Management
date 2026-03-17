@@ -73,12 +73,21 @@ $fields = [
 ];
 
 foreach($fields as $name => $value){
+
     if(is_numeric($value)){
-        $value_str = floatval($value);
+        $value = floatval($value);
+
+        mysqli_query($conn,
+        "INSERT INTO occupation_details (user_id, field_name, field_value)
+        VALUES ('$user_id', '$name', '$value')");
+
     } else {
-        $value_str = mysqli_real_escape_string($conn, $value);
+        $value = mysqli_real_escape_string($conn, $value);
+
+        mysqli_query($conn,
+        "INSERT INTO occupation_details (user_id, field_name, field_text)
+        VALUES ('$user_id', '$name', '$value')");
     }
-    mysqli_query($conn, "INSERT INTO occupation_details (user_id, field_name, field_value) VALUES ('$user_id', '$name', '$value_str')");
 }
 
 /* --------------------------

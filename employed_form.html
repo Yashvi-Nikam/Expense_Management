@@ -74,11 +74,13 @@ background-color:#45a049;
 function validateEmployed(){
 
 let income = document.getElementById("income").value;
+let other_income = document.getElementById("other_income").value;
 let businessExpenses = document.getElementById("businessExpenses").value;
 let rent = document.getElementById("rent").value;
 let materials = document.getElementById("materials").value;
 let utilities = document.getElementById("utilities").value;
 let personalExpenses = document.getElementById("personalExpenses").value;
+let otherExpenses = document.getElementById("otherExpenses").value;
 let savings = document.getElementById("savings").value;
 
 if(isNaN(income) || income <= 0){
@@ -86,6 +88,10 @@ alert("Please enter a valid positive number in Monthly Income.");
 return false;
 }
 
+if(isNaN(other_income) || other_income < 0){
+alert("Please enter a valid positive number in Other Income.");
+return false;
+}
 
 if(isNaN(businessExpenses) || businessExpenses < 0){
 alert("Please enter a valid positive number in Business Expenses.");
@@ -109,6 +115,11 @@ return false;
 
 if(isNaN(personalExpenses) || personalExpenses < 0){
 alert("Please enter a valid positive number in Personal Expenses.");
+return false;
+}
+
+if(isNaN(otherExpenses) || otherExpenses < 0){
+alert("Please enter a valid positive number in Other Expenses.");   
 return false;
 }
 
