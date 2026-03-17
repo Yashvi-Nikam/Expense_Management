@@ -152,7 +152,7 @@ while($row=$r->fetch_assoc()) $transactions[]=$row;
 Expense History
 </button>
 
-<button onclick="openPage('monthlyReport.php')">
+<button onclick="openPage('monthly_report.php')">
 Monthly Report
 </button>
 
