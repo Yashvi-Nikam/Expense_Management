@@ -56,22 +56,17 @@ $current_year = date('Y');
 /* --------------------------
 CHECK DUPLICATE SUBMISSION
 ---------------------------*/
-
 $check = mysqli_query($conn,
 "SELECT * FROM goals
 WHERE user_id='$user_id'
 AND start_month='$current_month'
 AND start_year='$current_year'");
+$is_update = mysqli_num_rows($check) > 0;
 
-if(mysqli_num_rows($check) > 0){
-
-echo "<script>
-alert('You have already submitted details for this month.');
-window.location.href='dashboard.php';
-</script>";
-
-exit();
-
+if ($is_update) {
+    // Allow update
+} else {
+    // Proceed with insert
 }
 
 
@@ -117,21 +112,24 @@ $fields = [
 
 ];
 
+/* --------------------------
+STORE OCCUPATION DETAILS
+---------------------------*/
 foreach($fields as $name => $value){
-
     if(is_numeric($value)){
         $value = floatval($value);
-
-        mysqli_query($conn,
-        "INSERT INTO occupation_details (user_id, field_name, field_value)
-        VALUES ('$user_id', '$name', '$value')");
-
+        $updateQuery = "UPDATE occupation_details SET field_value='$value' WHERE user_id='$user_id' AND field_name='$name'";
+        mysqli_query($conn, $updateQuery);
+        if (mysqli_affected_rows($conn) == 0) {
+            mysqli_query($conn, "INSERT INTO occupation_details (user_id, field_name, field_value) VALUES ('$user_id', '$name', '$value')");
+        }
     } else {
         $value = mysqli_real_escape_string($conn, $value);
-
-        mysqli_query($conn,
-        "INSERT INTO occupation_details (user_id, field_name, field_text)
-        VALUES ('$user_id', '$name', '$value')");
+        $updateQuery = "UPDATE occupation_details SET field_text='$value' WHERE user_id='$user_id' AND field_name='$name'";
+        mysqli_query($conn, $updateQuery);
+        if (mysqli_affected_rows($conn) == 0) {
+            mysqli_query($conn, "INSERT INTO occupation_details (user_id, field_name, field_text) VALUES ('$user_id', '$name', '$value')");
+        }
     }
 }
 
@@ -139,35 +137,62 @@ foreach($fields as $name => $value){
 /* --------------------------
 STORE INCOME
 ---------------------------*/
-
-mysqli_query($conn,
-"INSERT INTO income (user_id,amount)
-VALUES ('$user_id','$total_income')");
+if ($is_update) {
+    mysqli_query($conn, "UPDATE income SET amount='$total_income' WHERE user_id='$user_id' AND MONTH(created_at)='$current_month' AND YEAR(created_at)='$current_year'");
+} else {
+    mysqli_query($conn, "INSERT INTO income (user_id, amount) VALUES ('$user_id', '$total_income')");
+}
 
 
 /* --------------------------
 STORE EXPENSE
 ---------------------------*/
-
-mysqli_query($conn,
-"INSERT INTO expenses (user_id,amount)
-VALUES ('$user_id','$total_expense')");
+if ($is_update) {
+    mysqli_query($conn, "UPDATE expenses SET amount='$total_expense' WHERE user_id='$user_id' AND MONTH(created_at)='$current_month' AND YEAR(created_at)='$current_year'");
+} else {
+    mysqli_query($conn, "INSERT INTO expenses (user_id, amount) VALUES ('$user_id', '$total_expense')");
+}
 
 /* --------------------------
 STORE GOAL DETAILS
 ---------------------------*/
+if ($is_update) {
+    mysqli_query($conn, "UPDATE goals SET goal_purpose='$goal', goal_amount='$saving_goal_amount', savings_amount='$calculated_monthly_saving' WHERE user_id='$user_id' AND start_month='$current_month' AND start_year='$current_year'");
+} else {
+    mysqli_query($conn, "INSERT INTO goals (user_id, goal_purpose, goal_amount, savings_amount, start_month, start_year) VALUES ('$user_id', '$goal', '$saving_goal_amount', '$calculated_monthly_saving', '$current_month', '$current_year')");
+}
 
-mysqli_query($conn,
-"INSERT INTO goals
-(user_id, savings_amount, goal_amount, goal_purpose, start_month, start_year)
-VALUES
-('$user_id', '$calculated_monthly_saving', '$saving_goal_amount', '$goal', '$current_month', '$current_year')");
+/* --------------------------
+STORE IN EXPENSE HISTORY
+---------------------------*/
+if (!$is_update) {
+    $summary = "Employed: Total Income $" . number_format($total_income, 2) . ", Total Expenses $" . number_format($total_expense, 2) . ", Savings $" . number_format($calculated_monthly_saving, 2);
+    $details = json_encode([
+        'profession' => $profession,
+        'income' => $income,
+        'other_income' => $other_income,
+        'business_expenses' => $businessExpenses,
+        'rent' => $rent,
+        'materials' => $materials,
+        'utilities' => $utilities,
+        'personal_expenses' => $personalExpenses,
+        'other_expenses' => $otherExpenses,
+        'savings_goal' => $saving_goal_amount,
+        'goal' => $goal
+    ]);
+
+    mysqli_query($conn,
+    "INSERT INTO expense_history (form_type, summary, details)
+    VALUES ('employed', '$summary', '$details')");
+}
+
 /* --------------------------
 SUCCESS MESSAGE
 ---------------------------*/
 
+$message = $is_update ? 'Employed details updated successfully!' : 'Employed details saved successfully!';
 echo "<script>
-alert('Employed details saved successfully!');
+alert('$message');
 window.location.href='dashboard.php';
 </script>";
 
