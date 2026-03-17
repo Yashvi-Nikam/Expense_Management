@@ -146,7 +146,7 @@ while($row=$r->fetch_assoc()) $transactions[]=$row;
 
 <img id="profilePhoto" class="profile" style="display:none;">
 
-<button onclick="openPage('userInfo.php')">User Info</button>
+<button onclick="openPage('edit_profile.php')">User Info</button>
 
 <button onclick="openPage('expenseHistory.php')">
 Expense History
