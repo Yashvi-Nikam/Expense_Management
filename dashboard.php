@@ -233,40 +233,6 @@ style="width:<?php echo $percent;?>%">
 
 </div>
 
-
-
-<!-- TABLE -->
-
-<section class="monthlySection">
-
-<h2>Current Month Transactions</h2>
-
-<table>
-
-<tr>
-<th>Date</th>
-<th>Type</th>
-<th>Description</th>
-<th>Amount</th>
-</tr>
-
-<?php foreach($transactions as $t){ ?>
-
-<tr>
-
-<td><?php echo date('d M',strtotime($t['created_at']));?></td>
-<td><?php echo $t['type'];?></td>
-<td><?php echo $t['description'];?></td>
-<td>₹<?php echo $t['amount'];?></td>
-
-</tr>
-
-<?php } ?>
-
-</table>
-
-</section>
-
 </div>
 
 
