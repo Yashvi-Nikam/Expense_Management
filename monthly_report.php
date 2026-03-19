@@ -32,6 +32,26 @@ $user_id = $_SESSION['user_id'];
 $current_month = date('m');
 $current_year = date('Y');
 
+/* ✅ INCOME BREAKDOWN */
+$incomeBreakdown = [];
+$query = $conn->prepare("
+    SELECT field_name, SUM(field_value) AS total
+    FROM occupation_details
+    WHERE user_id=? 
+    AND field_name LIKE '%income%' 
+    AND field_value IS NOT NULL
+    AND MONTH(created_at)=? 
+    AND YEAR(created_at)=?
+    GROUP BY field_name
+");
+$query->bind_param("iii", $user_id, $current_month, $current_year);
+$query->execute();
+$result = $query->get_result();
+
+while ($row = $result->fetch_assoc()) {
+    $incomeBreakdown[] = $row;
+}
+
 /* ✅ EXPENSE BREAKDOWN */
 $expenseBreakdown = [];
 $query = $conn->prepare("
@@ -49,6 +69,21 @@ $result = $query->get_result();
 
 while ($row = $result->fetch_assoc()) {
     $expenseBreakdown[] = $row;
+}
+
+/* ✅ GOALS DATA */
+$goals = [];
+$query = $conn->prepare("
+    SELECT savings_amount, goal_amount, goal_purpose
+    FROM goals
+    WHERE user_id=?
+");
+$query->bind_param("i", $user_id);
+$query->execute();
+$result = $query->get_result();
+
+while ($row = $result->fetch_assoc()) {
+    $goals[] = $row;
 }
 
 /* ✅ TRANSACTIONS */
@@ -81,51 +116,131 @@ $conn->close();
 <title>Monthly Report</title>
 
 <style>
+/* 🌿 GLOBAL STYLING */
 body {
-    font-family: Arial;
-    background: #f5f5f5;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #1e1e2f, #2c3e50);
     padding: 20px;
+    margin: 0;
 }
+
+/* 📦 MAIN CONTAINER */
 .container {
-    max-width: 900px;
+    max-width: 950px;
     margin: auto;
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.3);
 }
+
+/* 🧾 HEADINGS */
 h1 {
     text-align: center;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #020000;
 }
+
+h2 {
+    margin-top: 35px;
+    margin-bottom: 10px;
+    color: #000000;
+    border-left: 5px solid #4cdaaf;
+    padding-left: 10px;
+}
+
+/* 📊 TABLES (ALL TABLES SAME STYLE) */
 table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 15px;
+    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    background: white;
 }
-th, td {
-    padding: 10px;
-    border: 1px solid #ddd;
-}
+
 th {
-    background: #4caf50;
+    background: linear-gradient(135deg, #8b47e4, #397bee);
     color: white;
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
 }
-h2 {
-    margin-top: 30px;
+
+td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
 }
+
+/* Alternate row color */
+tr:nth-child(even) {
+    /* background: #fafafa; */
+    background: rgba(255,255,255,0.03);
+}
+
+/* Hover effect */
+tr:hover {
+    /* background: #f1f8e9;*/
+    background: rgba(0, 229, 255, 0.08);
+    transition: 0.2s;
+}
+
+/* 🎯 GOALS TABLE EXTRA */
+.goal-name {
+    font-weight: 600;
+    color: #333;
+}
+
+/* STATUS BADGES */
+.status {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.status.success {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.status.pending {
+    background: #fff3e0;
+    color: #ef6c00;
+}
+
+/* 🔗 NAVIGATION BUTTONS */
 .nav {
     text-align: center;
     margin-top: 30px;
 }
+
 .nav a {
     margin: 10px;
     padding: 10px 20px;
-    border: 1px solid #4caf50;
-    color: #4caf50;
+    border-radius: 25px;
+    background: linear-gradient(135deg, #00e5ff, #00bcd4);
+    color: #002b36;
     text-decoration: none;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(0, 229, 255, 0.4);
+    transition: all 0.2s ease;
 }
+
 .nav a:hover {
-    background: #4caf50;
-    color: white;
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 6px 20px rgba(0, 229, 255, 0.6);
+}
+
+/* 📝 OPTIONAL SUBTEXT */
+.subtitle {
+    text-align: center;
+    color: #666;
+    margin-bottom: 20px;
 }
 </style>
 
@@ -135,6 +250,28 @@ h2 {
 <div class="container">
 
     <h1>Monthly Report for <?php echo date('F Y'); ?></h1>
+
+
+
+    <!-- ✅ INCOME BREAKDOWN -->
+<h2>Income Breakdown</h2>
+
+<?php if (empty($incomeBreakdown)): ?>
+    <p>No income data available.</p>
+<?php else: ?>
+    <table>
+        <tr>
+            <th>Category</th>
+            <th>Total Amount</th>
+        </tr>
+        <?php foreach ($incomeBreakdown as $item): ?>
+            <tr>
+                <td><?php echo htmlspecialchars(ucfirst(str_replace('_', ' ', $item['field_name']))); ?></td>
+                <td><?php echo formatINR($item['total']); ?></td>
+            </tr>
+        <?php endforeach; ?>
+    </table>
+<?php endif; ?>
 
     <!-- ✅ EXPENSE BREAKDOWN -->
     <h2>Expense Breakdown</h2>
@@ -156,13 +293,51 @@ h2 {
         </table>
     <?php endif; ?>
 
+<!-- ✅ GOALS TABLE (MODERN STYLE) -->
+<h2>Your Savings Goals</h2>
+
+<?php if (empty($goals)): ?>
+    <p>No goals set yet.</p>
+<?php else: ?>
+    <table class="goal-table">
+        <tr>
+            <th>Goal</th>
+            <th>Saved</th>
+            <th>Target</th>
+            <th>Remaining</th>
+            <th>Status</th>
+        </tr>
+
+        <?php foreach ($goals as $goal): 
+            $saved = $goal['savings_amount'];
+            $target = $goal['goal_amount'];
+            $purpose = $goal['goal_purpose'];
+            $remaining = $target - $saved;
+        ?>
+        <tr>
+            <td class="goal-name"><?php echo htmlspecialchars($purpose); ?></td>
+            <td><?php echo formatINR($saved); ?></td>
+            <td><?php echo formatINR($target); ?></td>
+            <td><?php echo formatINR($remaining); ?></td>
+            <td>
+                <?php if ($remaining <= 0): ?>
+                    <span class="status success">🎉 Achieved</span>
+                <?php else: ?>
+                    <span class="status pending">Keep saving 💪</span>
+                <?php endif; ?>
+            </td>
+        </tr>
+        <?php endforeach; ?>
+    </table>
+<?php endif; ?>
+
     <!-- ✅ TRANSACTIONS -->
     <h2>Monthly Transactions</h2>
 
     <?php if (empty($transactions)): ?>
         <p>No transactions found.</p>
     <?php else: ?>
-        <table>
+        <table class="goal-table">
             <tr>
                 <th>Date</th>
                 <th>Type</th>
@@ -179,7 +354,7 @@ h2 {
                 </tr>
             <?php endforeach; ?>
 
-        </table>
+        </table><br><br>
     <?php endif; ?>
 
     <!-- ✅ NAVIGATION -->

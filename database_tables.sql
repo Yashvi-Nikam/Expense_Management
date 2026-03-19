@@ -58,3 +58,29 @@ CREATE TABLE goals (
 );
 
 
+
+-- MONTHLY HISTORY TABLE (for past months snapshots)
+CREATE TABLE monthly_history (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    total_income DECIMAL(10,2) NOT NULL,
+    total_expense DECIMAL(10,2) NOT NULL,
+    savings DECIMAL(10,2) NOT NULL,
+    goal_amount DECIMAL(10,2) NOT NULL,
+    goal_purpose VARCHAR(255) NOT NULL,
+    month TINYINT NOT NULL CHECK (month BETWEEN 1 AND 12),
+    year YEAR NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    UNIQUE KEY unique_user_month_year (user_id, month, year)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE monthly_breakdown (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    month INT,
+    year INT,
+    type VARCHAR(10), -- income / expense
+    category VARCHAR(100),
+    amount DECIMAL(10,2)
+);
