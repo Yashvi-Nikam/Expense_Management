@@ -30,9 +30,9 @@ GET FORM VALUES
 
 $fullName = isset($_POST['fullName']) ? $_POST['fullName'] : '';
 
-$monthlyBudget = isset($_POST['monthlyBudget']) ? floatval($_POST['monthlyBudget']) : 0;
+$monthlyincome = isset($_POST['monthlyincome']) ? floatval($_POST['monthlyincome']) : 0;
 
-$extra_budget = isset($_POST['extra_Budget']) ? floatval($_POST['extra_Budget']) : 0;
+$extra_income = isset($_POST['extra_income']) ? floatval($_POST['extra_income']) : 0;
 
 $incomeSource = isset($_POST['incomeSource']) ? $_POST['incomeSource'] : '';
 
@@ -86,7 +86,7 @@ if (!$is_update) {
 CALCULATIONS
 ---------------------------*/
 
-$total_income = $monthlyBudget + $extra_budget;
+$total_income = $monthlyincome + $extra_income;
 
 $total_expense =
 $groceries +
@@ -107,8 +107,8 @@ $fields = [
 
 'full_name' => $fullName,
 
-'monthly_budget' => $monthlyBudget,
-'extra_budget' => $extra_budget,
+'monthly_income' => $monthlyincome,
+'extra_income' => $extra_income,
 
 'income_source' => $incomeSource,
 
@@ -182,8 +182,8 @@ if (!$is_update) {
     $summary = "Housewife: Total Income $" . number_format($total_income, 2) . ", Total Expenses $" . number_format($total_expense, 2) . ", Savings $" . number_format($calculated_monthly_saving, 2);
     $details = json_encode([
         'full_name' => $fullName,
-        'monthly_budget' => $monthlyBudget,
-        'extra_budget' => $extra_budget,
+        'monthly_income' => $monthlyincome,
+        'extra_income' => $extra_income,
         'income_source' => $incomeSource,
         'groceries' => $groceries,
         'utilities' => $utilities,

@@ -89,8 +89,8 @@ display:block;
 
 function validateHousewife(){
 
-let monthlyBudget = document.getElementById("monthlyBudget").value;
-let extra_budget = document.getElementById("extra_Budget").value;
+let monthlyincome = document.getElementById("monthlyBudget").value;
+let extra_income = document.getElementById("extra_Budget").value;
 let groceries = document.getElementById("groceries").value;
 let utilities = document.getElementById("utilities").value;
 let education = document.getElementById("education").value;
@@ -99,13 +99,13 @@ let shopping = document.getElementById("shopping").value;
 let otherExpenses = document.getElementById("otherExpenses").value;
 let savings = document.getElementById("monthlySavings").value;
 
-if(isNaN(monthlyBudget) || monthlyBudget <= 0){
-alert("Please enter a valid Monthly Budget.");
+if(isNaN(monthlyincome) || monthlyincome <= 0){
+alert("Please enter a valid Monthly Income.");
 return false;
 }
 
-if(isNaN(extra_budget) || extra_budget < 0){
-alert("Please enter a valid Extra Budget.");
+if(isNaN(extra_income) || extra_income < 0){
+alert("Please enter a valid Extra Income.");
 return false;
 }
 
@@ -185,13 +185,13 @@ document.getElementById("otherExpenses").value = 0;
 </div>
 
 <div class="form-group">
-<label>Total monthly household budget <span class="required">*</span></label>
-<input type="text" id="monthlyBudget" name="monthlyBudget" required>
+<label>Total monthly household income <span class="required">*</span></label>
+<input type="text" id="monthlyincome" name="monthlyincome" required>
 </div>
 
 <div class="form-group">
-<label>Extra household budget if any</label>
-<input type="text" id="extra_Budget" name="extra_Budget" value="0">
+<label>Extra household income if any</label>
+<input type="text" id="extra_income" name="extra_income" value="0">
 </div>
 
 <div class="form-group">

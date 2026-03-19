@@ -32,9 +32,9 @@ $name = isset($_POST['name']) ? $_POST['name'] : '';
 
 $income_source = isset($_POST['source']) ? $_POST['source'] : '';
 
-$budget = isset($_POST['budget']) ? floatval($_POST['budget']) : 0;
+$budget = isset($_POST['income']) ? floatval($_POST['income']) : 0;
 
-$extra_budget = isset($_POST['extra_budget']) ? floatval($_POST['extra_budget']) : 0;
+$extra_budget = isset($_POST['extra_income']) ? floatval($_POST['extra_income']) : 0;
 
 $food_expense = isset($_POST['food_expense']) ? floatval($_POST['food_expense']) : 0;
 
@@ -84,7 +84,7 @@ if (!$is_update) {
 CALCULATIONS
 ---------------------------*/
 
-$total_income = $budget + $extra_budget;
+$total_income = $income + $extra_income;
 
 $total_expense =
 $food_expense +
@@ -105,8 +105,8 @@ $fields = [
 'name' => $name,
 'income_source' => $income_source,
 
-'budget' => $budget,
-'extra_budget' => $extra_budget,
+'budget' => $income,
+'extra_budget' => $extra_income,
 
 'food_expense' => $food_expense,
 'transport_expense' => $transport_expense,
