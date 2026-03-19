@@ -59,6 +59,21 @@ $calculated_monthly_saving = $total_income - $total_expense;
 /* --------------------------
 STORE OCCUPATION DETAILS
 ---------------------------*/
+$fields = [
+    'main_income' => $main_income,
+    'other_income' => $other_income,
+    'food_expense' => $food_expense,
+    'transportation_expense' => $transportation_expense,
+    'books_expense' => $books_expense,
+    'entertainment_expense' => $entertainment_expense,
+    'mobile_expense' => $mobile_expense,
+    'other_expense' => $other_expense,
+    'income_source' => $income_source,
+    'saving_goal' => $saving_goal,
+    'goal_amount' => $goal_amount,
+    'monthly_saving' => $calculated_monthly_saving
+];
+
 foreach($fields as $name => $value){
     if(is_numeric($value)){
         $value = floatval($value);

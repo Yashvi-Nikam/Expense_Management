@@ -163,30 +163,6 @@ if ($is_update) {
 }
 
 /* --------------------------
-STORE IN EXPENSE HISTORY
----------------------------*/
-if (!$is_update) {
-    $summary = "Employed: Total Income $" . number_format($total_income, 2) . ", Total Expenses $" . number_format($total_expense, 2) . ", Savings $" . number_format($calculated_monthly_saving, 2);
-    $details = json_encode([
-        'profession' => $profession,
-        'income' => $income,
-        'other_income' => $other_income,
-        'business_expenses' => $businessExpenses,
-        'rent' => $rent,
-        'materials' => $materials,
-        'utilities' => $utilities,
-        'personal_expenses' => $personalExpenses,
-        'other_expenses' => $otherExpenses,
-        'savings_goal' => $saving_goal_amount,
-        'goal' => $goal
-    ]);
-
-    mysqli_query($conn,
-    "INSERT INTO expense_history (form_type, summary, details)
-    VALUES ('employed', '$summary', '$details')");
-}
-
-/* --------------------------
 SUCCESS MESSAGE
 ---------------------------*/
 
