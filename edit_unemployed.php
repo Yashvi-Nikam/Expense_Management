@@ -1,3 +1,4 @@
+
 <?php
 session_start();
 require 'db_connect.php';
@@ -11,17 +12,19 @@ $user_id = $_SESSION['user_id'];
 
 // Fetch latest unemployed data from occupation_details
 $data = [];
-$fields = ['name', 'income_source', 'budget', 'extra_budget', 'food_expense', 'transport_expense', 'internet_expense', 'learning_expense', 'other_expense', 'monthly_saving', 'goal_amount', 'goal'];
+$fields = ['name', 'income_source', 'income', 'extra_income', 'food_expense', 'transport_expense', 'internet_expense', 'learning_expense', 'other_expense', 'monthly_saving', 'goal_amount', 'goal'];
 
 foreach ($fields as $field) {
-    $query = $conn->prepare("SELECT field_value, field_text FROM occupation_details WHERE user_id = ? AND field_name = ? ORDER BY created_at DESC LIMIT 1");
-    $query->bind_param("is", $user_id, $field);
-    $query->execute();
-    $result = $query->get_result()->fetch_assoc();
-    $data[$field] = is_numeric($result['field_value'] ?? $result['field_text']) ? floatval($result['field_value'] ?? $result['field_text']) : ($result['field_text'] ?? '');
+    $r = pg_query_params($conn,
+        "SELECT field_value, field_text FROM occupation_details WHERE user_id=$1 AND field_name=$2 ORDER BY created_at DESC LIMIT 1",
+        array($user_id, $field)
+    );
+    $result = pg_fetch_assoc($r);
+    $raw = $result['field_value'] ?? $result['field_text'] ?? '';
+    $data[$field] = is_numeric($raw) ? floatval($raw) : $raw;
 }
 
-$conn->close();
+pg_close($conn);
 ?>
 
 <!DOCTYPE html>
@@ -96,20 +99,20 @@ $conn->close();
     </style>
     <script>
         function validateUnemployed() {
-            let budget = document.getElementById("budget").value;
-            let extra_budget = document.getElementById("extra_budget").value;
+            let income = document.getElementById("income").value;
+            let extra_income = document.getElementById("extra_income").value;
             let food = document.getElementById("food").value;
             let transport = document.getElementById("transport").value;
             let internet = document.getElementById("internet").value;
             let other = document.getElementById("other").value;
             let saving = document.getElementById("saving").value;
 
-            if (isNaN(budget) || budget <= 0) {
-                alert("Please enter a valid number in Budget.");
+            if (isNaN(income) || income <= 0) {
+                alert("Please enter a valid number in Income.");
                 return false;
             }
-            if (isNaN(extra_budget) || extra_budget < 0) {
-                alert("Please enter a valid number in Extra Budget.");
+            if (isNaN(extra_income) || extra_income < 0) {
+                alert("Please enter a valid number in Extra Income.");
                 return false;
             }
             if (isNaN(food) || food < 0) {
@@ -155,11 +158,11 @@ $conn->close();
 
             <div class="section">
                 <h3>Income</h3>
-                <label for="budget">Monthly Available Budget</label>
-                <input type="text" id="budget" name="budget" value="<?php echo htmlspecialchars($data['budget']); ?>" required>
+                <label for="income">Monthly Available Income</label>
+                <input type="text" id="income" name="income" value="<?php echo htmlspecialchars($data['income']); ?>" required>
 
-                <label for="extra_budget">Any Extra income if any?</label>
-                <input type="text" id="extra_budget" name="extra_budget" value="<?php echo htmlspecialchars($data['extra_budget']); ?>">
+                <label for="extra_income">Any Extra income if any?</label>
+                <input type="text" id="extra_income" name="extra_income" value="<?php echo htmlspecialchars($data['extra_income']); ?>">
             </div>
 
             <div class="section">

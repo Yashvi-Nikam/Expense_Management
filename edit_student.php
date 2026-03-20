@@ -14,23 +14,26 @@ $data = [];
 $fields = ['main_income', 'other_income', 'income_source', 'food_expense', 'transportation_expense', 'books_expense', 'entertainment_expense', 'mobile_expense', 'other_expense', 'saving_goal'];
 
 foreach ($fields as $field) {
-    $query = $conn->prepare("SELECT field_value, field_text FROM occupation_details WHERE user_id = ? AND field_name = ? ORDER BY created_at DESC LIMIT 1");
-    $query->bind_param("is", $user_id, $field);
-    $query->execute();
-    $result = $query->get_result()->fetch_assoc();
-    $data[$field] = is_numeric($result['field_value'] ?? $result['field_text']) ? floatval($result['field_value'] ?? $result['field_text']) : ($result['field_text'] ?? '');
+    $r = pg_query_params($conn,
+        "SELECT field_value, field_text FROM occupation_details WHERE user_id=$1 AND field_name=$2 ORDER BY created_at DESC LIMIT 1",
+        array($user_id, $field)
+    );
+    $result = pg_fetch_assoc($r);
+    $raw = $result['field_value'] ?? $result['field_text'] ?? '';
+    $data[$field] = is_numeric($raw) ? floatval($raw) : $raw;
 }
 
 // Fetch goal data
-$goalQuery = $conn->prepare("SELECT goal_purpose, goal_amount FROM goals WHERE user_id = ? ORDER BY created_at DESC LIMIT 1");
-$goalQuery->bind_param("i", $user_id);
-$goalQuery->execute();
-$goal = $goalQuery->get_result()->fetch_assoc();
+$r = pg_query_params($conn,
+    "SELECT goal_purpose, goal_amount FROM goals WHERE user_id=$1 ORDER BY created_at DESC LIMIT 1",
+    array($user_id)
+);
+$goal = pg_fetch_assoc($r);
 
 $data['goal_purpose'] = $goal['goal_purpose'] ?? '';
-$data['goal_amount'] = $goal['goal_amount'] ?? 0;
+$data['goal_amount']  = $goal['goal_amount']  ?? 0;
 
-$conn->close();
+pg_close($conn);
 ?>
 
 <!DOCTYPE html>

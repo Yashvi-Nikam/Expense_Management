@@ -1,4 +1,3 @@
-
 <?php
 session_start();
 include("db_connect.php");
@@ -9,12 +8,12 @@ if(isset($_POST['login']) && isset($_POST['password'])){
     $password = $_POST['password'];
 
     // find user
-    $sql = "SELECT * FROM users WHERE username='$username'";
-    $result = mysqli_query($conn,$sql);
+    $sql = "SELECT * FROM users WHERE username=$1";
+    $result = pg_query_params($conn, $sql, array($username));
 
-    if(mysqli_num_rows($result) == 1){
+    if(pg_num_rows($result) == 1){
 
-        $user = mysqli_fetch_assoc($result);
+        $user = pg_fetch_assoc($result);
 
         // verify password
         if(password_verify($password, $user['password'])){

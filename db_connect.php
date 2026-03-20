@@ -1,13 +1,12 @@
 <?php
 $host = "localhost";
-$user = "root";
-$password = "";
+$user = "postgres";
+$password = "postgres";
 $database = "expense_management";
-$conn = mysqli_connect($host, $user, $password, $database);
+
+$conn = pg_connect("host=$host dbname=$database user=$user password=$password");
 
 if (!$conn) {
-
-    die("Connection failed: " . mysqli_connect_error());
+    die("Connection failed: " . pg_last_error());
 }
-//echo "Database connected successfully";
 ?>

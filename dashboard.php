@@ -2,7 +2,6 @@
 session_start();
 require 'db_connect.php';
 
-
 if(!isset($_SESSION['user_id'])){
     header("Location: index.html");
     exit();
@@ -11,80 +10,67 @@ if(!isset($_SESSION['user_id'])){
 $user_id = $_SESSION['user_id'];
 
 /* USER NAME */
-$userQuery = $conn->prepare("SELECT name FROM users WHERE user_id=?");
-$userQuery->bind_param("i",$user_id);
-$userQuery->execute();
-$user_name = $userQuery->get_result()->fetch_assoc()['name'] ?? "User";
+$r = pg_query_params($conn, "SELECT name FROM users WHERE user_id=$1", array($user_id));
+$user_name = pg_fetch_assoc($r)['name'] ?? "User";
 
 /* TOTAL INCOME */
-$q=$conn->prepare("SELECT SUM(amount) t FROM income WHERE user_id=?");
-$q->bind_param("i",$user_id);
-$q->execute();
-$total_income=$q->get_result()->fetch_assoc()['t'] ?? 0;
+$r = pg_query_params($conn, "SELECT SUM(amount) t FROM income WHERE user_id=$1", array($user_id));
+$total_income = pg_fetch_assoc($r)['t'] ?? 0;
 
 /* TOTAL EXPENSE */
-$q=$conn->prepare("SELECT SUM(amount) t FROM expenses WHERE user_id=?");
-$q->bind_param("i",$user_id);
-$q->execute();
-$total_expense=$q->get_result()->fetch_assoc()['t'] ?? 0;
+$r = pg_query_params($conn, "SELECT SUM(amount) t FROM expenses WHERE user_id=$1", array($user_id));
+$total_expense = pg_fetch_assoc($r)['t'] ?? 0;
 
 /* GOAL */
-$q=$conn->prepare("SELECT savings_amount,goal_amount FROM goals WHERE user_id=? ORDER BY created_at DESC LIMIT 1");
-$q->bind_param("i",$user_id);
-$q->execute();
-$g=$q->get_result()->fetch_assoc();
+$r = pg_query_params($conn, "
+    SELECT savings_amount, goal_amount FROM goals 
+    WHERE user_id=$1 
+    ORDER BY created_at DESC LIMIT 1
+", array($user_id));
+$g = pg_fetch_assoc($r);
 
-$savings_amount=$g['savings_amount'] ?? 0;
-$goal_amount=$g['goal_amount'] ?? 0;
+$savings_amount = $g['savings_amount'] ?? 0;
+$goal_amount    = $g['goal_amount']    ?? 0;
 
-$percent = $goal_amount>0 ? ($savings_amount/$goal_amount)*100 : 0;
+$percent = $goal_amount > 0 ? ($savings_amount / $goal_amount) * 100 : 0;
 $percent = round($percent);
 
 /* LIMIT PROGRESS TO 100% */
-if($percent > 100){
-    $percent = 100;
-}
+if($percent > 100) $percent = 100;
 
 /* PIE DATA */
-$categories=[];
-$amounts=[];
+$categories = [];
+$amounts    = [];
 
-$q=$conn->prepare("
-SELECT field_name,SUM(field_value) total
-FROM occupation_details
-WHERE user_id=? AND field_name LIKE '%expense%'
-GROUP BY field_name
-");
-$q->bind_param("i",$user_id);
-$q->execute();
-$r=$q->get_result();
+$r = pg_query_params($conn, "
+    SELECT field_name, SUM(field_value) total
+    FROM occupation_details
+    WHERE user_id=$1 AND field_name LIKE '%expense%'
+    GROUP BY field_name
+", array($user_id));
 
-while($row=$r->fetch_assoc()){
-$categories[]=$row['field_name'];
-$amounts[]=$row['total'];
+while($row = pg_fetch_assoc($r)){
+    $categories[] = $row['field_name'];
+    $amounts[]    = $row['total'];
 }
- 
+
 /* MONTHLY */
-$transactions=[];
-$month=date('m');
-$year=date('Y');
+$transactions = [];
+$month = date('m');
+$year  = date('Y');
 
-$q=$conn->prepare("
-SELECT 'Income' type,amount,created_at,'Income Entry' description
-FROM income
-WHERE user_id=? AND MONTH(created_at)=? AND YEAR(created_at)=?
-UNION ALL
-SELECT 'Expense',amount,created_at,'Expense Entry'
-FROM expenses
-WHERE user_id=? AND MONTH(created_at)=? AND YEAR(created_at)=?
-ORDER BY created_at DESC
-");
+$r = pg_query_params($conn, "
+    SELECT 'Income' AS type, amount, created_at, 'Income Entry' AS description
+    FROM income
+    WHERE user_id=$1 AND EXTRACT(MONTH FROM created_at)=$2 AND EXTRACT(YEAR FROM created_at)=$3
+    UNION ALL
+    SELECT 'Expense', amount, created_at, 'Expense Entry'
+    FROM expenses
+    WHERE user_id=$4 AND EXTRACT(MONTH FROM created_at)=$5 AND EXTRACT(YEAR FROM created_at)=$6
+    ORDER BY created_at DESC
+", array($user_id, $month, $year, $user_id, $month, $year));
 
-$q->bind_param("iiiiii",$user_id,$month,$year,$user_id,$month,$year);
-$q->execute();
-$r=$q->get_result();
-
-while($row=$r->fetch_assoc()) $transactions[]=$row;
+while($row = pg_fetch_assoc($r)) $transactions[] = $row;
 ?>
 
 <!DOCTYPE html>
@@ -127,7 +113,7 @@ while($row=$r->fetch_assoc()) $transactions[]=$row;
 </div>
 
 <div id="profileMenu" class="profileMenu">
-<button onclick="openPage('userInfo.php')">Profile</button>
+<button onclick="openPage('edit_profile.php')">Profile</button>
 <button onclick="window.location.href='logout.php'">Logout</button>
 </div>
 

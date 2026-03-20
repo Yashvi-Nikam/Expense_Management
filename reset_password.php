@@ -24,17 +24,12 @@ if($password !== $confirm_password){
 $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
 // check if user exists
-$stmt = $conn->prepare("SELECT user_id FROM users WHERE username=?");
-$stmt->bind_param("s",$username);
-$stmt->execute();
-$result = $stmt->get_result();
+$result = pg_query_params($conn, "SELECT user_id FROM users WHERE username=$1", array($username));
 
-if($result->num_rows === 1){
+if(pg_num_rows($result) === 1){
 
     // update password
-    $update = $conn->prepare("UPDATE users SET password=? WHERE username=?");
-    $update->bind_param("ss",$hashed_password,$username);
-    $update->execute();
+    pg_query_params($conn, "UPDATE users SET password=$1 WHERE username=$2", array($hashed_password, $username));
 
     // destroy session so user must login again
     session_unset();

@@ -10,24 +10,26 @@ if(isset($_POST['username']) && isset($_POST['password'])){
     // Hash password
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-    // Insert into users table
-    $sql = "INSERT INTO users (username, password) VALUES ('$username', '$hashed_password')";
+    // Insert into users table and return inserted id
+    $sql = "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING user_id";
 
-    if(mysqli_query($conn, $sql)){
+    $result = pg_query_params($conn, $sql, array($username, $hashed_password));
+
+    if($result){
 
         // get inserted user id
-        $user_id = mysqli_insert_id($conn);
+        $row = pg_fetch_assoc($result);
+        $user_id = $row['user_id'];
 
         // store in session
         $_SESSION['user_id'] = $user_id;
 
         // redirect to basic details page
-    
         header("Location: basicinfoform.html");
         exit();
 
     } else {
-        echo "Error creating account: " . mysqli_error($conn);
+        echo "Error creating account: " . pg_last_error($conn);
     }
 
 } else {

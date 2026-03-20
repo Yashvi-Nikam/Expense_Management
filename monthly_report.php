@@ -7,7 +7,7 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-/* ✅ INR FORMAT FUNCTION */
+/* INR FORMAT FUNCTION */
 function formatINR($number) {
     $number = round($number, 2);
     $decimal = substr(number_format($number, 2, '.', ''), -3);
@@ -30,83 +30,71 @@ function formatINR($number) {
 
 $user_id = $_SESSION['user_id'];
 $current_month = date('m');
-$current_year = date('Y');
+$current_year  = date('Y');
 
-/* ✅ INCOME BREAKDOWN */
+/* INCOME BREAKDOWN */
 $incomeBreakdown = [];
-$query = $conn->prepare("
+$r = pg_query_params($conn, "
     SELECT field_name, SUM(field_value) AS total
     FROM occupation_details
-    WHERE user_id=? 
-    AND field_name LIKE '%income%' 
+    WHERE user_id=$1
+    AND field_name LIKE '%income%'
     AND field_value IS NOT NULL
-    AND MONTH(created_at)=? 
-    AND YEAR(created_at)=?
+    AND EXTRACT(MONTH FROM created_at)=$2
+    AND EXTRACT(YEAR FROM created_at)=$3
     GROUP BY field_name
-");
-$query->bind_param("iii", $user_id, $current_month, $current_year);
-$query->execute();
-$result = $query->get_result();
+", array($user_id, $current_month, $current_year));
 
-while ($row = $result->fetch_assoc()) {
+while ($row = pg_fetch_assoc($r)) {
     $incomeBreakdown[] = $row;
 }
 
-/* ✅ EXPENSE BREAKDOWN */
+/* EXPENSE BREAKDOWN */
 $expenseBreakdown = [];
-$query = $conn->prepare("
+$r = pg_query_params($conn, "
     SELECT field_name, SUM(field_value) AS total
     FROM occupation_details
-    WHERE user_id=? 
-    AND field_name LIKE '%expense%' 
-    AND MONTH(created_at)=? 
-    AND YEAR(created_at)=?
+    WHERE user_id=$1
+    AND field_name LIKE '%expense%'
+    AND EXTRACT(MONTH FROM created_at)=$2
+    AND EXTRACT(YEAR FROM created_at)=$3
     GROUP BY field_name
-");
-$query->bind_param("iii", $user_id, $current_month, $current_year);
-$query->execute();
-$result = $query->get_result();
+", array($user_id, $current_month, $current_year));
 
-while ($row = $result->fetch_assoc()) {
+while ($row = pg_fetch_assoc($r)) {
     $expenseBreakdown[] = $row;
 }
 
-/* ✅ GOALS DATA */
+/* GOALS DATA */
 $goals = [];
-$query = $conn->prepare("
+$r = pg_query_params($conn, "
     SELECT savings_amount, goal_amount, goal_purpose
     FROM goals
-    WHERE user_id=?
-");
-$query->bind_param("i", $user_id);
-$query->execute();
-$result = $query->get_result();
+    WHERE user_id=$1
+", array($user_id));
 
-while ($row = $result->fetch_assoc()) {
+while ($row = pg_fetch_assoc($r)) {
     $goals[] = $row;
 }
 
-/* ✅ TRANSACTIONS */
+/* TRANSACTIONS */
 $transactions = [];
-$query = $conn->prepare("
+$r = pg_query_params($conn, "
     SELECT 'Income' AS type, amount, created_at, 'Income Entry' AS description
     FROM income
-    WHERE user_id=? AND MONTH(created_at)=? AND YEAR(created_at)=?
+    WHERE user_id=$1 AND EXTRACT(MONTH FROM created_at)=$2 AND EXTRACT(YEAR FROM created_at)=$3
     UNION ALL
     SELECT 'Expense', amount, created_at, 'Expense Entry'
     FROM expenses
-    WHERE user_id=? AND MONTH(created_at)=? AND YEAR(created_at)=?
+    WHERE user_id=$4 AND EXTRACT(MONTH FROM created_at)=$5 AND EXTRACT(YEAR FROM created_at)=$6
     ORDER BY created_at DESC
-");
-$query->bind_param("iiiiii", $user_id, $current_month, $current_year, $user_id, $current_month, $current_year);
-$query->execute();
-$result = $query->get_result();
+", array($user_id, $current_month, $current_year, $user_id, $current_month, $current_year));
 
-while ($row = $result->fetch_assoc()) {
+while ($row = pg_fetch_assoc($r)) {
     $transactions[] = $row;
 }
 
-$conn->close();
+pg_close($conn);
 ?>
 
 <!DOCTYPE html>

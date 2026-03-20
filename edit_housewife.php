@@ -1,3 +1,4 @@
+
 <?php
 session_start();
 require 'db_connect.php';
@@ -11,17 +12,19 @@ $user_id = $_SESSION['user_id'];
 
 // Fetch latest housewife data from occupation_details
 $data = [];
-$fields = ['full_name', 'monthly_budget', 'extra_budget', 'income_source', 'groceries_expense', 'utilities_expense', 'education_expense', 'transportation_expense', 'shopping_expense', 'other_expense', 'monthly_saving', 'goal_amount', 'goal'];
+$fields = ['full_name', 'monthly_income', 'extra_income', 'income_source', 'groceries_expense', 'utilities_expense', 'education_expense', 'transportation_expense', 'shopping_expense', 'other_expense', 'monthly_saving', 'goal_amount', 'goal'];
 
 foreach ($fields as $field) {
-    $query = $conn->prepare("SELECT field_value, field_text FROM occupation_details WHERE user_id = ? AND field_name = ? ORDER BY created_at DESC LIMIT 1");
-    $query->bind_param("is", $user_id, $field);
-    $query->execute();
-    $result = $query->get_result()->fetch_assoc();
-    $data[$field] = is_numeric($result['field_value'] ?? $result['field_text']) ? floatval($result['field_value'] ?? $result['field_text']) : ($result['field_text'] ?? '');
+    $r = pg_query_params($conn,
+        "SELECT field_value, field_text FROM occupation_details WHERE user_id=$1 AND field_name=$2 ORDER BY created_at DESC LIMIT 1",
+        array($user_id, $field)
+    );
+    $result = pg_fetch_assoc($r);
+    $raw = $result['field_value'] ?? $result['field_text'] ?? '';
+    $data[$field] = is_numeric($raw) ? floatval($raw) : $raw;
 }
-
-$conn->close();
+echo "<pre>"; print_r($data); echo "</pre>";
+pg_close($conn);
 ?>
 
 <!DOCTYPE html>
@@ -92,8 +95,8 @@ $conn->close();
     </style>
     <script>
         function validateHousewife() {
-            let monthlyBudget = document.getElementById("monthlyBudget").value;
-            let extra_budget = document.getElementById("extra_Budget").value;
+            let monthlyIncome = document.getElementById("monthlyIncome").value;
+            let extraIncome = document.getElementById("extraIncome").value;
             let groceries = document.getElementById("groceries").value;
             let utilities = document.getElementById("utilities").value;
             let education = document.getElementById("education").value;
@@ -102,13 +105,13 @@ $conn->close();
             let otherExpenses = document.getElementById("otherExpenses").value;
             let savings = document.getElementById("monthlySavings").value;
 
-            if (isNaN(monthlyBudget) || monthlyBudget <= 0) {
-                alert("Please enter a valid Monthly Budget.");
+            if (isNaN(monthlyIncome) || monthlyIncome <= 0) {
+                alert("Please enter a valid Monthly Income.");
                 return false;
             }
 
-            if (isNaN(extra_budget) || extra_budget < 0) {
-                alert("Please enter a valid Extra Budget.");
+            if (isNaN(extraIncome) || extraIncome < 0) {
+                alert("Please enter a valid Extra Income.");
                 return false;
             }
 
@@ -160,11 +163,11 @@ $conn->close();
             <label for="fullName">What is your full name?</label>
             <input type="text" id="fullName" name="fullName" value="<?php echo htmlspecialchars($data['full_name']); ?>" required>
 
-            <label for="monthlyBudget">Total monthly household budget</label>
-            <input type="text" id="monthlyBudget" name="monthlyBudget" value="<?php echo htmlspecialchars($data['monthly_budget']); ?>" required>
+            <label for="monthlyIncome">Total monthly household income</label>
+            <input type="text" id="monthlyIncome" name="monthlyincome" value="<?php echo htmlspecialchars($data['monthly_income']); ?>" required>
 
-            <label for="extra_Budget">Extra household budget if any</label>
-            <input type="text" id="extra_Budget" name="extra_Budget" value="<?php echo htmlspecialchars($data['extra_budget']); ?>">
+            <label for="extraIncome">Extra household income if any</label>
+            <input type="text" id="extraIncome" name="extra_income" value="<?php echo htmlspecialchars($data['extra_income']); ?>">
 
             <label>Main source of income</label>
             <div class="radio-group">

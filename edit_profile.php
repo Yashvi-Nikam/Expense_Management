@@ -10,17 +10,18 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 
 // Fetch user's basic info
-$userQuery = $conn->prepare("SELECT name, age, gender, occupation FROM users WHERE user_id = ?");
-$userQuery->bind_param("i", $user_id);
-$userQuery->execute();
-$user = $userQuery->get_result()->fetch_assoc();
+$r = pg_query_params($conn, 
+    "SELECT name, age, gender, occupation FROM users WHERE user_id=$1", 
+    array($user_id)
+);
+$user = pg_fetch_assoc($r);
 
-$name = $user['name'] ?? '';
-$age = $user['age'] ?? '';
-$gender = $user['gender'] ?? '';
+$name       = $user['name']       ?? '';
+$age        = $user['age']        ?? '';
+$gender     = $user['gender']     ?? '';
 $occupation = $user['occupation'] ?? '';
 
-$conn->close();
+pg_close($conn);
 ?>
 
 <!DOCTYPE html>

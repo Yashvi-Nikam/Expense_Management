@@ -11,18 +11,15 @@ if(!isset($_SESSION['user_id'])){
 $user_id = $_SESSION['user_id'];
 
 /* Fetch latest goal for this user */
-$goalQuery = $conn->prepare("
+$result = pg_query_params($conn, "
     SELECT savings_amount, goal_amount, goal_purpose 
     FROM goals 
-    WHERE user_id = ? 
+    WHERE user_id = $1 
     ORDER BY created_at DESC 
     LIMIT 1
-");
+", array($user_id));
 
-$goalQuery->bind_param("i", $user_id);
-$goalQuery->execute();
-$result = $goalQuery->get_result();
-$goalResult = $result->fetch_assoc();
+$goalResult = pg_fetch_assoc($result);
 
 /* Assign values safely */
 $savings_amount = $goalResult['savings_amount'] ?? 0;

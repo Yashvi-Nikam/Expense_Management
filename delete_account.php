@@ -9,10 +9,9 @@ if(!isset($_SESSION['user_id'])){
 
 $user_id = $_SESSION['user_id'];
 
-$stmt = $conn->prepare("DELETE FROM users WHERE user_id = ?");
-$stmt->bind_param("i", $user_id);
+$result = pg_query_params($conn, "DELETE FROM users WHERE user_id=$1", array($user_id));
 
-if($stmt->execute()){
+if($result){
 
     session_unset();
     session_destroy();

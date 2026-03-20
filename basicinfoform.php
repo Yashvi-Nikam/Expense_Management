@@ -11,22 +11,24 @@ if(!isset($_SESSION['user_id'])){
 $user_id = $_SESSION['user_id'];
 
 // get form values
-$name = $_POST['name'];
-$age = $_POST['age'];
-$gender = $_POST['gender'];
+$name       = $_POST['name'];
+$age        = $_POST['age'];
+$gender     = $_POST['gender'];
 $occupation = $_POST['occupation'];
-$is_edit = isset($_POST['is_edit']) ? true : false;
+$is_edit    = isset($_POST['is_edit']) ? true : false;
 
 // update users table
-$sql = "UPDATE users 
-        SET 
-            name='$name',
-            age='$age',
-            gender='$gender',
-            occupation='$occupation'
-        WHERE user_id='$user_id'";
+$result = pg_query_params($conn, "
+    UPDATE users 
+    SET 
+        name=$1,
+        age=$2,
+        gender=$3,
+        occupation=$4
+    WHERE user_id=$5
+", array($name, $age, $gender, $occupation, $user_id));
 
-if(mysqli_query($conn,$sql)){
+if($result){
 
     if($occupation == "student"){
         $redirect = $is_edit ? 'edit_student.php' : 'student_form.html';
@@ -61,6 +63,6 @@ if(mysqli_query($conn,$sql)){
     exit();
 
 }else{
-    echo "Error updating details: " . mysqli_error($conn);
+    echo "Error updating details: " . pg_last_error($conn);
 }
 ?>

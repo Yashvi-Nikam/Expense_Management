@@ -14,14 +14,16 @@ $data = [];
 $fields = ['profession', 'income', 'other_income', 'business_expense', 'rent_expense', 'materials_expense', 'utilities_expense', 'personal_expense', 'other_expense', 'monthly_saving', 'goal_amount', 'goal'];
 
 foreach ($fields as $field) {
-    $query = $conn->prepare("SELECT field_value, field_text FROM occupation_details WHERE user_id = ? AND field_name = ? ORDER BY created_at DESC LIMIT 1");
-    $query->bind_param("is", $user_id, $field);
-    $query->execute();
-    $result = $query->get_result()->fetch_assoc();
-    $data[$field] = is_numeric($result['field_value'] ?? $result['field_text']) ? floatval($result['field_value'] ?? $result['field_text']) : ($result['field_text'] ?? '');
+    $r = pg_query_params($conn,
+        "SELECT field_value, field_text FROM occupation_details WHERE user_id=$1 AND field_name=$2 ORDER BY created_at DESC LIMIT 1",
+        array($user_id, $field)
+    );
+    $result = pg_fetch_assoc($r);
+    $raw = $result['field_value'] ?? $result['field_text'] ?? '';
+    $data[$field] = is_numeric($raw) ? floatval($raw) : $raw;
 }
 
-$conn->close();
+pg_close($conn);
 ?>
 
 <!DOCTYPE html>

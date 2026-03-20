@@ -5,12 +5,12 @@ include("db_connect.php");
 
 $username = $_POST['username'];
 
-$sql = "SELECT * FROM users WHERE username='$username'";
-$result = mysqli_query($conn,$sql);
+$sql = "SELECT * FROM users WHERE username=$1";
+$result = pg_query_params($conn, $sql, array($username));
 
-if(mysqli_num_rows($result) == 1)
+if(pg_num_rows($result) == 1)
 {
-    $user = mysqli_fetch_assoc($result);
+    $user = pg_fetch_assoc($result);
 
     $_SESSION['reset_user_id'] = $user['user_id'];
 

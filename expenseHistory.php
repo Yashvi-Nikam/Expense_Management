@@ -8,76 +8,63 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-$conn = new mysqli("localhost", "root", "", "expense_management");
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+$conn = pg_connect("host=localhost dbname=expense_management user=postgres password=postgres");
+if (!$conn) {
+    die("Connection failed: " . pg_last_error());
 }
 
 // Username
-$userQuery = $conn->prepare("SELECT name FROM users WHERE user_id=?");
-$userQuery->bind_param("i", $user_id);
-$userQuery->execute();
-$username = $userQuery->get_result()->fetch_assoc()['name'] ?? 'User';
+$r = pg_query_params($conn, "SELECT name FROM users WHERE user_id=$1", array($user_id));
+$username = pg_fetch_assoc($r)['name'] ?? 'User';
 
 // ================= AUTO FINALIZATION =================
 
-// TEST MODE (force current month as previous)
 $current_month = date('n');
-$current_year = date('Y');
+$current_year  = date('Y');
 
 $prev_month = $current_month;
-$prev_year = $current_year;
-
-/*$prev_month = $current_month - 1;
-$prev_year = $current_year;*/
+$prev_year  = $current_year;
 
 if ($prev_month == 0) {
     $prev_month = 12;
-    $prev_year = $current_year - 1;
+    $prev_year  = $current_year - 1;
 }
 
-$check = $conn->prepare("SELECT * FROM monthly_history WHERE user_id=? AND month=? AND year=?");
-$check->bind_param("iii", $user_id, $prev_month, $prev_year);
-$check->execute();
-$resCheck = $check->get_result();
+$r = pg_query_params($conn, 
+    "SELECT * FROM monthly_history WHERE user_id=$1 AND month=$2 AND year=$3",
+    array($user_id, $prev_month, $prev_year)
+);
 
-if ($resCheck->num_rows == 0) {
+if (pg_num_rows($r) == 0) {
 
     // totals
-    $inc = $conn->prepare("SELECT SUM(amount) as total FROM income WHERE user_id=?");
-    $inc->bind_param("i", $user_id);
-    $inc->execute();
-    $total_income = $inc->get_result()->fetch_assoc()['total'] ?? 0;
+    $r2 = pg_query_params($conn, "SELECT SUM(amount) AS total FROM income WHERE user_id=$1", array($user_id));
+    $total_income = pg_fetch_assoc($r2)['total'] ?? 0;
 
-    $exp = $conn->prepare("SELECT SUM(amount) as total FROM expenses WHERE user_id=?");
-    $exp->bind_param("i", $user_id);
-    $exp->execute();
-    $total_expense = $exp->get_result()->fetch_assoc()['total'] ?? 0;
+    $r2 = pg_query_params($conn, "SELECT SUM(amount) AS total FROM expenses WHERE user_id=$1", array($user_id));
+    $total_expense = pg_fetch_assoc($r2)['total'] ?? 0;
 
-    $goalQuery = $conn->prepare("SELECT goal_amount, goal_purpose FROM goals WHERE user_id=?");
-    $goalQuery->bind_param("i", $user_id);
-    $goalQuery->execute();
-    $goal = $goalQuery->get_result()->fetch_assoc();
+    $r2 = pg_query_params($conn, "SELECT goal_amount, goal_purpose FROM goals WHERE user_id=$1", array($user_id));
+    $goal = pg_fetch_assoc($r2);
 
     $savings = $total_income - $total_expense;
 
     // insert summary
-    $stmt = $conn->prepare("INSERT INTO monthly_history 
-    (user_id, total_income, total_expense, savings, goal_amount, goal_purpose, month, year) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-
-    $stmt->bind_param("iddddsii", $user_id, $total_income, $total_expense, $savings, $goal['goal_amount'], $goal['goal_purpose'], $prev_month, $prev_year);
-    $stmt->execute();
+    pg_query_params($conn, "
+        INSERT INTO monthly_history 
+        (user_id, total_income, total_expense, savings, goal_amount, goal_purpose, month, year) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    ", array($user_id, $total_income, $total_expense, $savings, $goal['goal_amount'], $goal['goal_purpose'], $prev_month, $prev_year));
 
     // insert breakdown
-    $q = $conn->prepare("SELECT field_name, field_value FROM occupation_details WHERE user_id=?");
-    $q->bind_param("i", $user_id);
-    $q->execute();
-    $res = $q->get_result();
+    $r2 = pg_query_params($conn, 
+        "SELECT field_name, field_value FROM occupation_details WHERE user_id=$1", 
+        array($user_id)
+    );
 
-    while ($row = $res->fetch_assoc()) {
+    while ($row = pg_fetch_assoc($r2)) {
 
-        $name = $row['field_name'];
+        $name  = $row['field_name'];
         $value = $row['field_value'];
 
         if ($value <= 0) continue;
@@ -86,20 +73,19 @@ if ($resCheck->num_rows == 0) {
 
             $type = (strpos($name, 'income') !== false) ? 'income' : 'expense';
 
-            $stmt = $conn->prepare("INSERT INTO monthly_breakdown 
-            (user_id, month, year, type, category, amount) 
-            VALUES (?, ?, ?, ?, ?, ?)");
-
-            $stmt->bind_param("iiissd", $user_id, $prev_month, $prev_year, $type, $name, $value);
-            $stmt->execute();
+            pg_query_params($conn, "
+                INSERT INTO monthly_breakdown 
+                (user_id, month, year, type, category, amount) 
+                VALUES ($1, $2, $3, $4, $5, $6)
+            ", array($user_id, $prev_month, $prev_year, $type, $name, $value));
         }
     }
 }
 
 // ================= SEARCH =================
 
-$record = null;
-$income_data = [];
+$record      = null;
+$income_data  = [];
 $expense_data = [];
 
 if (isset($_GET['month'], $_GET['year'])) {
@@ -107,18 +93,19 @@ if (isset($_GET['month'], $_GET['year'])) {
     $m = $_GET['month'];
     $y = $_GET['year'];
 
-    $stmt = $conn->prepare("SELECT * FROM monthly_history WHERE user_id=? AND month=? AND year=?");
-    $stmt->bind_param("iii", $user_id, $m, $y);
-    $stmt->execute();
-    $record = $stmt->get_result()->fetch_assoc();
+    $r = pg_query_params($conn, 
+        "SELECT * FROM monthly_history WHERE user_id=$1 AND month=$2 AND year=$3",
+        array($user_id, $m, $y)
+    );
+    $record = pg_fetch_assoc($r);
 
     if ($record) {
-        $stmt = $conn->prepare("SELECT category, amount, type FROM monthly_breakdown WHERE user_id=? AND month=? AND year=?");
-        $stmt->bind_param("iii", $user_id, $m, $y);
-        $stmt->execute();
-        $res = $stmt->get_result();
+        $r = pg_query_params($conn, 
+            "SELECT category, amount, type FROM monthly_breakdown WHERE user_id=$1 AND month=$2 AND year=$3",
+            array($user_id, $m, $y)
+        );
 
-        while ($row = $res->fetch_assoc()) {
+        while ($row = pg_fetch_assoc($r)) {
             if ($row['type'] == 'income') $income_data[] = $row;
             else $expense_data[] = $row;
         }
