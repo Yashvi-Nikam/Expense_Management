@@ -4,15 +4,15 @@ require 'db_connect.php';
 
 /* Check login session */
 if(!isset($_SESSION['user_id'])){
-    header("Location: signin.html");
+    header("Location: signin.php");
     exit();
 }
 
 $user_id = $_SESSION['user_id'];
 
-/* Fetch latest goal for this user */
+/* Fetch goal info */
 $result = pg_query_params($conn, "
-    SELECT savings_amount, goal_amount, goal_purpose 
+    SELECT goal_amount, goal_purpose 
     FROM goals 
     WHERE user_id = $1 
     ORDER BY created_at DESC 
@@ -21,8 +21,20 @@ $result = pg_query_params($conn, "
 
 $goalResult = pg_fetch_assoc($result);
 
-/* Assign values safely */
-$savings_amount = $goalResult['savings_amount'] ?? 0;
+/* Calculate savings from occupation_details */
+$income_result = pg_query_params($conn, "
+    SELECT SUM(field_value) as total FROM occupation_details 
+    WHERE user_id=$1 AND field_name LIKE '%income%'
+", array($user_id));
+$total_income = pg_fetch_assoc($income_result)['total'] ?? 0;
+
+$expense_result = pg_query_params($conn, "
+    SELECT SUM(field_value) as total FROM occupation_details 
+    WHERE user_id=$1 AND field_name LIKE '%expense%'
+", array($user_id));
+$total_expense = pg_fetch_assoc($expense_result)['total'] ?? 0;
+
+$savings_amount = $total_income - $total_expense;
 $goal_purpose = $goalResult['goal_purpose'] ?? "your savings goal";
 ?>
 

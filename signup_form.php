@@ -1,0 +1,156 @@
+<?php
+session_start();
+$signup_message = '';
+if(isset($_SESSION['signup_message'])){
+    $signup_message = $_SESSION['signup_message'];
+    unset($_SESSION['signup_message']);
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Expense Manager - Sign Up</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('moneyy.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 80px auto;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(3px);
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0px 10px 25px rgba(0,0,0,0.3);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 8px 10px;
+            margin-bottom: 12px;
+            border: 1px solid #edecec;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            background-color: #4caf50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .footer a {
+            color: #4caf50;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .message-box{
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .error-message{
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .success-message{
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Create an Account</h2>
+
+        <?php if($signup_message): ?>
+            <?php 
+            $is_success = strpos($signup_message, 'successfully') !== false;
+            $message_class = $is_success ? 'success-message' : 'error-message';
+            ?>
+            <div class="message-box <?php echo $message_class; ?>">
+                <?php echo htmlspecialchars($signup_message); ?>
+            </div>
+        <?php endif; ?>
+
+        <form id="signupForm" action="signup.php" method="post">
+            <label for="fullName">Full Name</label>
+            <input type="text" id="fullName" name="fullName" required />
+
+            <label for="email">Email Address</label>
+            <input type="email" id="username" name="username" required />
+
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required />
+
+            <label for="confirmPassword">Confirm Password</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" required />
+
+            <button type="submit">Sign Up</button>
+        </form>
+        <div class="footer">
+            <p>Already have an account? <a href="signin.php">Log in</a></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('signupForm').addEventListener('submit', function (e) {
+            const pwd = document.getElementById('password').value;
+            const confirm = document.getElementById('confirmPassword').value;
+            if (pwd !== confirm) {
+                e.preventDefault();
+                alert('Passwords do not match.');
+            }
+        });
+    </script>
+</body>
+
+</html>

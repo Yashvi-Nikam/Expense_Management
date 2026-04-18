@@ -10,7 +10,7 @@ CHECK LOGIN
 if(!isset($_SESSION['user_id'])){
 echo "<script>
 alert('User not logged in');
-window.location.href='signin.html';
+window.location.href='signin.php';
 </script>";
 exit();
 }

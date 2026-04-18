@@ -1,0 +1,106 @@
+<?php
+session_start();
+$reset_message = '';
+if(isset($_SESSION['reset_message'])){
+    $reset_message = $_SESSION['reset_message'];
+    unset($_SESSION['reset_message']);
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forgot Password</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(rgba(0,0,0,0.4),rgba(0,0,0,0.4)),url("moneyy.jpg");
+    background-size:cover;
+    background-position:center;
+    background-repeat: no-repeat;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.forgot-container {
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(3px);
+    padding: 30px;
+    border-radius: 10px;
+    width: 350px;
+    text-align: center;
+    border:1px solid rgba(255,255,255,0.3);
+    box-shadow: 0px 10px 25px rgba(0,0,0,0.3);
+}
+
+input, button {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+}
+
+button {
+    background: #007BFF;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #0056b3;
+}
+
+.message-box{
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.error-message{
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.success-message{
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+</style>
+</head>
+<body>
+
+<div class="forgot-container">
+    <h2>Reset Password</h2>
+
+    <?php if($reset_message): ?>
+        <?php 
+        $is_success = strpos($reset_message, 'successfully') !== false;
+        $message_class = $is_success ? 'success-message' : 'error-message';
+        ?>
+        <div class="message-box <?php echo $message_class; ?>">
+            <?php echo htmlspecialchars($reset_message); ?>
+        </div>
+    <?php endif; ?>
+
+    <form action="reset_password.php" method="post">
+        <input type="text" name="username" placeholder="Enter your username" required>
+        <input type="password" name="password" placeholder="New Password" required>
+        <input type="password" name="confirm_password" placeholder="Confirm Password" required>
+        <button type="submit">Reset Password</button>
+    </form>
+
+    <div style="margin-top: 10px;">
+        <a href="signin.php">Back to Login</a>
+    </div>
+</div>
+</body>
+
+</html>

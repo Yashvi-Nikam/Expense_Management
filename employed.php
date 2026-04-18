@@ -10,7 +10,7 @@ CHECK LOGIN
 if(!isset($_SESSION['user_id'])){
 echo "<script>
 alert('User not logged in');
-window.location.href='signin.html';
+window.location.href='signin.php';
 </script>";
 exit();
 }
@@ -67,37 +67,69 @@ $calculated_monthly_saving = $total_income - $total_expense;
 
 
 /* --------------------------
-STORE OCCUPATION DETAILS
+VALIDATE INPUTS BEFORE STORING
 ---------------------------*/
 
-$fields = [
-    'profession'        => $profession,
-    'income'            => $income,
-    'other_income'      => $other_income,
-    'business_expense'  => $businessExpenses,
-    'rent_expense'      => $rent,
-    'materials_expense' => $materials,
-    'utilities_expense' => $utilities,
-    'personal_expense'  => $personalExpenses,
-    'other_expense'     => $otherExpenses,
-    'monthly_saving'    => $calculated_monthly_saving,
-    'goal_amount'       => $saving_goal_amount,
-    'goal'              => $goal
-];
+try {
+    // Validate profession
+    if(empty($profession) || strlen($profession) < 2){
+        throw new Exception("Please enter a valid profession/business name.");
+    }
 
-foreach($fields as $name => $value){
-    if(is_numeric($value)){
-        $value = floatval($value);
-        $r = pg_query_params($conn,
-            "UPDATE occupation_details SET field_value=$1 WHERE user_id=$2 AND field_name=$3",
-            array($value, $user_id, $name)
-        );
-        if(pg_affected_rows($r) == 0){
-            pg_query_params($conn,
-                "INSERT INTO occupation_details (user_id, field_name, field_value) VALUES ($1, $2, $3)",
-                array($user_id, $name, $value)
+    // Validate income values
+    if($income < 0 || $other_income < 0 || $businessExpenses < 0 || $rent < 0 || 
+       $materials < 0 || $utilities < 0 || $personalExpenses < 0 || $otherExpenses < 0 || $saving_goal_amount < 0){
+        throw new Exception("Please enter valid positive numbers for all fields.");
+    }
+
+    // Validate that total income is positive
+    if($total_income <= 0){
+        throw new Exception("Total income must be greater than 0.");
+    }
+
+    // Validate goal
+    if(empty($goal)){
+        throw new Exception("Please select a saving goal.");
+    }
+
+    /* --------------------------
+    STORE OCCUPATION DETAILS
+    ---------------------------*/
+
+    $fields = [
+        'profession'        => $profession,
+        'income'            => $income,
+        'other_income'      => $other_income,
+        'business_expense'  => $businessExpenses,
+        'rent_expense'      => $rent,
+        'materials_expense' => $materials,
+        'utilities_expense' => $utilities,
+        'personal_expense'  => $personalExpenses,
+        'other_expense'     => $otherExpenses,
+        'monthly_saving'    => $calculated_monthly_saving,
+        'goal_amount'       => $saving_goal_amount,
+        'goal'              => $goal
+    ];
+
+    foreach($fields as $name => $value){
+        if(is_numeric($value)){
+            $value = floatval($value);
+            $r = pg_query_params($conn,
+                "UPDATE occupation_details SET field_value=$1 WHERE user_id=$2 AND field_name=$3",
+                array($value, $user_id, $name)
             );
-        }
+            if(!$r){
+                throw new Exception("Database error: " . pg_last_error($conn));
+            }
+            if(pg_affected_rows($r) == 0){
+                $insert_result = pg_query_params($conn,
+                    "INSERT INTO occupation_details (user_id, field_name, field_value) VALUES ($1, $2, $3)",
+                    array($user_id, $name, $value)
+                );
+                if(!$insert_result){
+                    throw new Exception("Database error: " . pg_last_error($conn));
+                }
+            }
     } else {
         $r = pg_query_params($conn,
             "UPDATE occupation_details SET field_text=$1 WHERE user_id=$2 AND field_name=$3",

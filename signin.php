@@ -1,8 +1,16 @@
+<?php
+session_start();
+$error_message = '';
+if(isset($_SESSION['login_message'])){
+    $error_message = $_SESSION['login_message'];
+    unset($_SESSION['login_message']); // Clear message after displaying
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Login 1Page</title>
+<title>Login</title>
 
 <style>
 
@@ -36,6 +44,26 @@ body{
     margin-bottom:20px;
     text-align:center;
     color:black;
+}
+
+.message-box{
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.error-message{
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.success-message{
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
 }
 
 .login-btn{
@@ -112,10 +140,21 @@ body{
 </head>
 <body>
 <div class="login-container">
-<h2>Here For Login We Got You!!</h2>
+<h2>Login to Your Account</h2>
+
+<?php if($error_message): ?>
+    <?php 
+    $is_success = strpos($error_message, 'successfully') !== false;
+    $message_class = $is_success ? 'success-message' : 'error-message';
+    ?>
+    <div class="message-box <?php echo $message_class; ?>">
+        <?php echo htmlspecialchars($error_message); ?>
+    </div>
+<?php endif; ?>
+
 <form action="login.php" method="post">
 <label for="Username">Username/Email</label>
-<input type="text" id="Username" name="login"class="input-box" placeholder="Username or Email" required>
+<input type="text" id="Username" name="login" class="input-box" placeholder="Username or Email" required>
 <label for="password">Password</label>
 <input type="password" id="password" name="password" class="input-box" placeholder="Password" required>
 <div class="actions">
@@ -125,8 +164,7 @@ body{
 <button type="submit" class="login-btn">Login</button>
 </form>
 <div class="divider">OR</div>
-<button class="google-btn" >
-    <!-- using Google's SVG logo from their branding guidelines, sized appropriately -->
+<button class="google-btn">
     <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" style="width:18px;height:18px;" />
     Continue with Google
 </button>

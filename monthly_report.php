@@ -65,33 +65,29 @@ while ($row = pg_fetch_assoc($r)) {
     $expenseBreakdown[] = $row;
 }
 
+/* TOTAL INCOME & EXPENSE */
+$total_income = 0;
+$total_expense = 0;
+$savings = 0;
+
+foreach ($incomeBreakdown as $item) {
+    $total_income += $item['total'];
+}
+foreach ($expenseBreakdown as $item) {
+    $total_expense += $item['total'];
+}
+$savings = $total_income - $total_expense;
+
 /* GOALS DATA */
 $goals = [];
 $r = pg_query_params($conn, "
-    SELECT savings_amount, goal_amount, goal_purpose
+    SELECT goal_amount, goal_purpose
     FROM goals
     WHERE user_id=$1
 ", array($user_id));
 
 while ($row = pg_fetch_assoc($r)) {
     $goals[] = $row;
-}
-
-/* TRANSACTIONS */
-$transactions = [];
-$r = pg_query_params($conn, "
-    SELECT 'Income' AS type, amount, created_at, 'Income Entry' AS description
-    FROM income
-    WHERE user_id=$1 AND EXTRACT(MONTH FROM created_at)=$2 AND EXTRACT(YEAR FROM created_at)=$3
-    UNION ALL
-    SELECT 'Expense', amount, created_at, 'Expense Entry'
-    FROM expenses
-    WHERE user_id=$4 AND EXTRACT(MONTH FROM created_at)=$5 AND EXTRACT(YEAR FROM created_at)=$6
-    ORDER BY created_at DESC
-", array($user_id, $current_month, $current_year, $user_id, $current_month, $current_year));
-
-while ($row = pg_fetch_assoc($r)) {
-    $transactions[] = $row;
 }
 
 pg_close($conn);
@@ -239,7 +235,20 @@ tr:hover {
 
     <h1>Monthly Report for <?php echo date('F Y'); ?></h1>
 
-
+    <!-- 📊 SUMMARY TABLE -->
+    <h2>Summary</h2>
+    <table style="margin-bottom: 30px;">
+        <tr>
+            <th>Total Income</th>
+            <th>Total Expenses</th>
+            <th>Total Savings</th>
+        </tr>
+        <tr>
+            <td><strong><?php echo formatINR($total_income); ?></strong></td>
+            <td><strong><?php echo formatINR($total_expense); ?></strong></td>
+            <td><strong><?php echo formatINR($savings); ?></strong></td>
+        </tr>
+    </table>
 
     <!-- ✅ INCOME BREAKDOWN -->
 <h2>Income Breakdown</h2>
@@ -296,15 +305,14 @@ tr:hover {
             <th>Status</th>
         </tr>
 
-        <?php foreach ($goals as $goal): 
-            $saved = $goal['savings_amount'];
+        <?php foreach ($goals as $goal):  
             $target = $goal['goal_amount'];
             $purpose = $goal['goal_purpose'];
-            $remaining = $target - $saved;
+            $remaining = $target - $savings;
         ?>
         <tr>
             <td class="goal-name"><?php echo htmlspecialchars($purpose); ?></td>
-            <td><?php echo formatINR($saved); ?></td>
+            <td><?php echo formatINR($savings); ?></td>
             <td><?php echo formatINR($target); ?></td>
             <td><?php echo formatINR($remaining); ?></td>
             <td>
@@ -318,32 +326,6 @@ tr:hover {
         <?php endforeach; ?>
     </table>
 <?php endif; ?>
-
-    <!-- ✅ TRANSACTIONS -->
-    <h2>Monthly Transactions</h2>
-
-    <?php if (empty($transactions)): ?>
-        <p>No transactions found.</p>
-    <?php else: ?>
-        <table class="goal-table">
-            <tr>
-                <th>Date</th>
-                <th>Type</th>
-                <th>Description</th>
-                <th>Amount</th>
-            </tr>
-
-            <?php foreach ($transactions as $t): ?>
-                <tr>
-                    <td><?php echo htmlspecialchars($t['created_at']); ?></td>
-                    <td><?php echo htmlspecialchars($t['type']); ?></td>
-                    <td><?php echo htmlspecialchars($t['description']); ?></td>
-                    <td><?php echo formatINR($t['amount']); ?></td>
-                </tr>
-            <?php endforeach; ?>
-
-        </table><br><br>
-    <?php endif; ?>
 
     <!-- ✅ NAVIGATION -->
     <div class="nav">

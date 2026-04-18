@@ -54,110 +54,120 @@ $calculated_monthly_saving = $total_income - $total_expense;
 
 
 /* --------------------------
-STORE OCCUPATION DETAILS
+VALIDATE INPUTS BEFORE STORING
 ---------------------------*/
 
-$fields = [
-    'main_income'            => $main_income,
-    'other_income'           => $other_income,
-    'food_expense'           => $food_expense,
-    'transportation_expense' => $transportation_expense,
-    'books_expense'          => $books_expense,
-    'entertainment_expense'  => $entertainment_expense,
-    'mobile_expense'         => $mobile_expense,
-    'other_expense'          => $other_expense,
-    'income_source'          => $income_source,
-    'saving_goal'            => $saving_goal,
-    'goal_amount'            => $goal_amount,
-    'monthly_saving'         => $calculated_monthly_saving
-];
+try {
+    // Validate income values
+    if($main_income < 0 || $other_income < 0 || $food_expense < 0 || $transportation_expense < 0 ||
+       $books_expense < 0 || $entertainment_expense < 0 || $mobile_expense < 0 || $other_expense < 0 || $goal_amount < 0){
+        throw new Exception("Please enter valid positive numbers for all fields.");
+    }
 
-foreach($fields as $name => $value){
-    if(is_numeric($value)){
-        $value = floatval($value);
-        $r = pg_query_params($conn,
-            "UPDATE occupation_details SET field_value=$1 WHERE user_id=$2 AND field_name=$3",
-            array($value, $user_id, $name)
-        );
-        if(pg_affected_rows($r) == 0){
-            pg_query_params($conn,
-                "INSERT INTO occupation_details (user_id, field_name, field_value) VALUES ($1, $2, $3)",
-                array($user_id, $name, $value)
+    // Validate that main income is positive
+    if($main_income <= 0){
+        throw new Exception("Pocket money must be greater than 0.");
+    }
+
+    // Validate saving goal
+    if(empty($saving_goal) || strlen($saving_goal) < 2){
+        throw new Exception("Please enter a valid saving goal.");
+    }
+
+    // Validate income source
+    $valid_sources = ['Parents', 'Scholarship', 'Part-time Job'];
+    if(!in_array($income_source, $valid_sources)){
+        throw new Exception("Invalid income source selected.");
+    }
+
+    /* --------------------------
+    STORE OCCUPATION DETAILS
+    ---------------------------*/
+
+    $fields = [
+        'main_income'            => $main_income,
+        'other_income'           => $other_income,
+        'food_expense'           => $food_expense,
+        'transportation_expense' => $transportation_expense,
+        'books_expense'          => $books_expense,
+        'entertainment_expense'  => $entertainment_expense,
+        'mobile_expense'         => $mobile_expense,
+        'other_expense'          => $other_expense,
+        'income_source'          => $income_source,
+        'saving_goal'            => $saving_goal,
+        'goal_amount'            => $goal_amount,
+        'monthly_saving'         => $calculated_monthly_saving
+    ];
+
+    foreach($fields as $name => $value){
+        if(is_numeric($value)){
+            $value = floatval($value);
+            $r = pg_query_params($conn,
+                "UPDATE occupation_details SET field_value=$1 WHERE user_id=$2 AND field_name=$3",
+                array($value, $user_id, $name)
             );
-        }
-    } else {
-        $r = pg_query_params($conn,
-            "UPDATE occupation_details SET field_text=$1 WHERE user_id=$2 AND field_name=$3",
-            array($value, $user_id, $name)
-        );
-        if(pg_affected_rows($r) == 0){
-            pg_query_params($conn,
-                "INSERT INTO occupation_details (user_id, field_name, field_text) VALUES ($1, $2, $3)",
-                array($user_id, $name, $value)
+            if(!$r){
+                throw new Exception("Database error: " . pg_last_error($conn));
+            }
+            if(pg_affected_rows($r) == 0){
+                $insert_result = pg_query_params($conn,
+                    "INSERT INTO occupation_details (user_id, field_name, field_value) VALUES ($1, $2, $3)",
+                    array($user_id, $name, $value)
+                );
+                if(!$insert_result){
+                    throw new Exception("Database error: " . pg_last_error($conn));
+                }
+            }
+        } else {
+            $r = pg_query_params($conn,
+                "UPDATE occupation_details SET field_text=$1 WHERE user_id=$2 AND field_name=$3",
+                array($value, $user_id, $name)
             );
+            if(!$r){
+                throw new Exception("Database error: " . pg_last_error($conn));
+            }
+            if(pg_affected_rows($r) == 0){
+                $insert_result = pg_query_params($conn,
+                    "INSERT INTO occupation_details (user_id, field_name, field_text) VALUES ($1, $2, $3)",
+                    array($user_id, $name, $value)
+                );
+                if(!$insert_result){
+                    throw new Exception("Database error: " . pg_last_error($conn));
+                }
+            }
         }
     }
+
+
+    // Handle goals
+    if($is_update){
+        $goal_result = pg_query_params($conn,
+            "UPDATE goals SET goal_purpose=$1, goal_amount=$2 WHERE user_id=$3 AND start_month=$4 AND start_year=$5",
+            array($saving_goal, $goal_amount, $user_id, $current_month, $current_year)
+        );
+        if(!$goal_result){
+            throw new Exception("Failed to update goals: " . pg_last_error($conn));
+        }
+    } else {
+        $goal_result = pg_query_params($conn,
+            "INSERT INTO goals (user_id, goal_purpose, goal_amount, start_month, start_year) VALUES ($1, $2, $3, $4, $5)",
+            array($user_id, $saving_goal, $goal_amount, $current_month, $current_year)
+        );
+        if(!$goal_result){
+            throw new Exception("Failed to insert goals: " . pg_last_error($conn));
+        }
+    }
+
+    echo "<script>
+    alert('Details submitted successfully!');\n    window.location.href='dashboard.php';
+    </script>";
+    exit();
+
+} catch (Exception $e) {
+    echo "<script>
+    alert('Error: " . addslashes($e->getMessage()) . "');
+    window.history.back();
+    </script>";
+    exit();
 }
-
-
-/* --------------------------
-STORE TOTAL INCOME
----------------------------*/
-
-if($is_update){
-    pg_query_params($conn,
-        "UPDATE income SET amount=$1 WHERE user_id=$2 AND EXTRACT(MONTH FROM created_at)=$3 AND EXTRACT(YEAR FROM created_at)=$4",
-        array($total_income, $user_id, $current_month, $current_year)
-    );
-} else {
-    pg_query_params($conn,
-        "INSERT INTO income (user_id, amount) VALUES ($1, $2)",
-        array($user_id, $total_income)
-    );
-}
-
-
-/* --------------------------
-STORE TOTAL EXPENSE
----------------------------*/
-
-if($is_update){
-    pg_query_params($conn,
-        "UPDATE expenses SET amount=$1 WHERE user_id=$2 AND EXTRACT(MONTH FROM created_at)=$3 AND EXTRACT(YEAR FROM created_at)=$4",
-        array($total_expense, $user_id, $current_month, $current_year)
-    );
-} else {
-    pg_query_params($conn,
-        "INSERT INTO expenses (user_id, amount) VALUES ($1, $2)",
-        array($user_id, $total_expense)
-    );
-}
-
-
-/* --------------------------
-STORE GOALS
----------------------------*/
-
-if($is_update){
-    pg_query_params($conn,
-        "UPDATE goals SET goal_purpose=$1, goal_amount=$2, savings_amount=$3 WHERE user_id=$4 AND start_month=$5 AND start_year=$6",
-        array($saving_goal, $goal_amount, $calculated_monthly_saving, $user_id, $current_month, $current_year)
-    );
-} else {
-    pg_query_params($conn,
-        "INSERT INTO goals (user_id, goal_purpose, goal_amount, savings_amount, start_month, start_year) VALUES ($1, $2, $3, $4, $5, $6)",
-        array($user_id, $saving_goal, $goal_amount, $calculated_monthly_saving, $current_month, $current_year)
-    );
-}
-
-
-/* --------------------------
-SUCCESS MESSAGE
----------------------------*/
-
-$message = $is_update ? 'Student details updated successfully!' : 'Student details saved successfully!';
-echo "<script>
-alert('$message');
-window.location.href='dashboard.php';
-</script>";
 ?>

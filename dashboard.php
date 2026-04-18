@@ -14,23 +14,29 @@ $r = pg_query_params($conn, "SELECT name FROM users WHERE user_id=$1", array($us
 $user_name = pg_fetch_assoc($r)['name'] ?? "User";
 
 /* TOTAL INCOME */
-$r = pg_query_params($conn, "SELECT SUM(amount) t FROM income WHERE user_id=$1", array($user_id));
+$r = pg_query_params($conn, "
+    SELECT SUM(field_value) t FROM occupation_details 
+    WHERE user_id=$1 AND field_name LIKE '%income%' AND field_value > 0
+", array($user_id));
 $total_income = pg_fetch_assoc($r)['t'] ?? 0;
 
 /* TOTAL EXPENSE */
-$r = pg_query_params($conn, "SELECT SUM(amount) t FROM expenses WHERE user_id=$1", array($user_id));
+$r = pg_query_params($conn, "
+    SELECT SUM(field_value) t FROM occupation_details 
+    WHERE user_id=$1 AND field_name LIKE '%expense%'
+", array($user_id));
 $total_expense = pg_fetch_assoc($r)['t'] ?? 0;
 
 /* GOAL */
 $r = pg_query_params($conn, "
-    SELECT savings_amount, goal_amount FROM goals 
+    SELECT goal_amount FROM goals 
     WHERE user_id=$1 
     ORDER BY created_at DESC LIMIT 1
 ", array($user_id));
 $g = pg_fetch_assoc($r);
 
-$savings_amount = $g['savings_amount'] ?? 0;
 $goal_amount    = $g['goal_amount']    ?? 0;
+$savings_amount = $total_income - $total_expense;
 
 $percent = $goal_amount > 0 ? ($savings_amount / $goal_amount) * 100 : 0;
 $percent = round($percent);
@@ -56,21 +62,27 @@ while($row = pg_fetch_assoc($r)){
 
 /* MONTHLY */
 $transactions = [];
-$month = date('m');
-$year  = date('Y');
 
+/* Get all occupation details from current month */
 $r = pg_query_params($conn, "
-    SELECT 'Income' AS type, amount, created_at, 'Income Entry' AS description
-    FROM income
-    WHERE user_id=$1 AND EXTRACT(MONTH FROM created_at)=$2 AND EXTRACT(YEAR FROM created_at)=$3
-    UNION ALL
-    SELECT 'Expense', amount, created_at, 'Expense Entry'
-    FROM expenses
-    WHERE user_id=$4 AND EXTRACT(MONTH FROM created_at)=$5 AND EXTRACT(YEAR FROM created_at)=$6
+    SELECT field_name, field_value, created_at
+    FROM occupation_details
+    WHERE user_id=$1
     ORDER BY created_at DESC
-", array($user_id, $month, $year, $user_id, $month, $year));
+", array($user_id));
 
-while($row = pg_fetch_assoc($r)) $transactions[] = $row;
+while($row = pg_fetch_assoc($r)){
+    $field_name = $row['field_name'];
+    $is_income = strpos($field_name, 'income') !== false;
+    $type = $is_income ? 'Income' : 'Expense';
+    
+    $transactions[] = [
+        'type' => $type,
+        'amount' => floatval($row['field_value']),
+        'created_at' => $row['created_at'],
+        'description' => ucfirst(str_replace('_', ' ', $field_name))
+    ];
+}
 ?>
 
 <!DOCTYPE html>
@@ -145,7 +157,7 @@ Monthly Report
 <button onclick="toggleSettings()">Settings</button>
 
 <div id="settingsMenu" class="submenu">
-<button onclick="openPage('reset_password.html')">
+<button onclick="openPage('forgot_password.php')">
 Reset Password
 </button>
 
