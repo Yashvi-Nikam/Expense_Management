@@ -1,3 +1,5 @@
+sessionStorage.clear();
+
 /* ---------------- SIDEBAR TOGGLE ---------------- */
 
 function toggleMenu(){
@@ -214,58 +216,38 @@ maintainAspectRatio:false
 
 /* ---------------- THANK YOU MESSAGE ---------------- */
 
-if(savingsPercent >= 100 && !sessionStorage.getItem("goalShown")){
+if(savingsPercent >= 100){
+    alert("🎉 Congratulations! You reached your savings goal!");
+    window.location.href = "thank_you.php";
 
-alert("🎉 Congratulations! You reached your savings goal!");
+} else{
 
-sessionStorage.setItem("goalShown","true");
+    /* ---------------- EDIT PROMPT ---------------- */
 
-window.location.href="thank_you.php";
-
-}
-
-
-/* ---------------- EDIT PROMPT ---------------- */
-
-if(!sessionStorage.getItem("editPromptShown")){
-
-setTimeout(function(){
-
-let edit = confirm("Do you want to edit something?");
-
-if(edit){
-window.location.href="userInfo.php";
-}
-
-sessionStorage.setItem("editPromptShown","true");
-
-},1500);
-
-}
+    setTimeout(function(){
+        let edit = confirm("Do you want to edit something?");
+        if(edit){
+            
+            toggleMenu();
+        }
+    }, 1500);
 
 
-/* ---------------- MONTH END REPORT ---------------- */
+    /* ---------------- MONTH END REPORT ---------------- */
 
-let today = new Date();
-let lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+    let today = new Date();
+    let lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
 
-/* run only on last day of month and only once per session */
+    if(today.getDate() === lastDay){
 
-if(today.getDate() === lastDay && !sessionStorage.getItem("monthlyReportShown")){
- 
-setTimeout(function(){
+        setTimeout(function(){
+            let report = confirm("Your monthly report is ready! Do you want to view it?");
+            if(report){
+               
+            toggleMenu();
+            }
+        }, 3000);
 
-let report = confirm("Your monthly report is ready! Do you want to view or edit something?");
-
-if(report){
-toggleMenu();   // opens your sidebar slider
-}
-
-sessionStorage.setItem("monthlyReportShown","true");
-
-},3000);
+    }
 
 }
-
-
-

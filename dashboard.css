@@ -284,7 +284,72 @@ font-size:13px;
 transition:width 0.6s ease;
 }
 
+/* BELL */
+.bell-container {
+    position: relative;
+    display: inline-block;
+    margin-right: 15px;
+}
 
+.bell-icon {
+    font-size: 22px;
+    cursor: pointer;
+    position: relative;
+}
+
+.bell-badge {
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    background: red;
+    color: white;
+    border-radius: 50%;
+    font-size: 11px;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.bell-dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 35px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    padding: 15px;
+    width: 220px;
+    z-index: 999;
+    text-align: center;
+}
+
+.bell-dropdown.show {
+    display: block;
+}
+
+.bell-dropdown p {
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.bell-dropdown a {
+    padding: 8px 16px;
+    background: #5e70c4;
+    color: white;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.bell-dropdown a:hover {
+    background: #4a5bb0;
+}
 
 
 /* OVERLAY */

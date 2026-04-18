@@ -9,6 +9,71 @@ if(!isset($_SESSION['user_id'])){
 
 $user_id = $_SESSION['user_id'];
 
+$current_month = date('n');
+$current_year  = date('Y');
+
+$prev_month = $current_month - 1;
+$prev_year  = $current_year;
+if ($prev_month == 0) {
+    $prev_month = 12;
+    $prev_year  = $current_year - 1;
+}
+
+/* AUTO ARCHIVE PREVIOUS MONTH */
+$r = pg_query_params($conn, 
+    "SELECT 1 FROM monthly_history WHERE user_id=$1 AND month=$2 AND year=$3",
+    array($user_id, $prev_month, $prev_year)
+);
+
+if (pg_num_rows($r) == 0) {
+    $r2 = pg_query_params($conn, 
+        "SELECT amount AS total FROM income WHERE user_id=$1 LIMIT 1", 
+        array($user_id)
+    );
+    $archive_income = pg_fetch_assoc($r2)['total'] ?? 0;
+
+    $r2 = pg_query_params($conn, 
+        "SELECT amount AS total FROM expenses WHERE user_id=$1 LIMIT 1", 
+        array($user_id)
+    );
+    $archive_expense = pg_fetch_assoc($r2)['total'] ?? 0;
+
+    $r2 = pg_query_params($conn, 
+        "SELECT goal_amount, goal_purpose, savings_amount FROM goals 
+         WHERE user_id=$1 ORDER BY created_at DESC LIMIT 1", 
+        array($user_id)
+    );
+    $archive_goal = pg_fetch_assoc($r2);
+    $archive_savings = $archive_goal['savings_amount'] ?? 0;
+
+    pg_query_params($conn, "
+        INSERT INTO monthly_history 
+        (user_id, total_income, total_expense, savings, goal_amount, goal_purpose, month, year) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+        array($user_id, $archive_income, $archive_expense, $archive_savings, $archive_goal['goal_amount'], $archive_goal['goal_purpose'], $prev_month, $prev_year)
+    );
+
+    $r2 = pg_query_params($conn, 
+        "SELECT field_name, field_value FROM occupation_details WHERE user_id=$1 AND field_value > 0", 
+        array($user_id)
+    );
+
+    while ($row = pg_fetch_assoc($r2)) {
+        $name  = $row['field_name'];
+        $value = $row['field_value'];
+
+        if (strpos($name, 'income') !== false || strpos($name, 'expense') !== false) {
+            $type = (strpos($name, 'income') !== false) ? 'income' : 'expense';
+            pg_query_params($conn, "
+                INSERT INTO monthly_breakdown 
+                (user_id, month, year, type, category, amount) 
+                VALUES ($1, $2, $3, $4, $5, $6)",
+                array($user_id, $prev_month, $prev_year, $type, $name, $value)
+            );
+        }
+    }
+}
+
 /* USER NAME */
 $r = pg_query_params($conn, "SELECT name FROM users WHERE user_id=$1", array($user_id));
 $user_name = pg_fetch_assoc($r)['name'] ?? "User";
@@ -132,6 +197,25 @@ while($row = pg_fetch_assoc($r)){
 </div>
 </div>
 </div>
+
+<!-- NOTIFICATION BELL -->
+<?php
+$today = date('j');
+$last_day = date('t'); // last day of current month
+?>
+
+<?php if($today == $last_day): ?>
+<div class="bell-container">
+    <span class="bell-icon" onclick="document.getElementById('bellDropdown').classList.toggle('show')">
+        🔔
+        <span class="bell-badge">1</span>
+    </span>
+    <div id="bellDropdown" class="bell-dropdown">
+        <p>📊 Your monthly report for <?php echo date('F'); ?> is ready!</p>
+        <a href="expenseHistory.php">View Report</a>
+    </div>
+</div>
+<?php endif; ?>
 
 <!-- SIDEBAR -->
 <div id="sidebar" class="sidebar">

@@ -22,13 +22,15 @@ $username = pg_fetch_assoc($r)['name'] ?? 'User';
 $current_month = date('n');
 $current_year  = date('Y');
 
-$prev_month = $current_month;
+$prev_month = $current_month - 1 ;
 $prev_year  = $current_year;
 
 if ($prev_month == 0) {
     $prev_month = 12;
     $prev_year  = $current_year - 1;
 }
+
+
 
 $r = pg_query_params($conn, 
     "SELECT * FROM monthly_history WHERE user_id=$1 AND month=$2 AND year=$3",
@@ -37,17 +39,25 @@ $r = pg_query_params($conn,
 
 if (pg_num_rows($r) == 0) {
 
-    // totals
-    $r2 = pg_query_params($conn, "SELECT SUM(amount) AS total FROM income WHERE user_id=$1", array($user_id));
+    // Archive previous month using current totals from active tables
+    $r2 = pg_query_params($conn, 
+        "SELECT amount AS total FROM income WHERE user_id=$1 LIMIT 1", 
+        array($user_id));
     $total_income = pg_fetch_assoc($r2)['total'] ?? 0;
 
-    $r2 = pg_query_params($conn, "SELECT SUM(amount) AS total FROM expenses WHERE user_id=$1", array($user_id));
+    $r2 = pg_query_params($conn, 
+        "SELECT amount AS total FROM expenses WHERE user_id=$1 LIMIT 1", 
+        array($user_id));
     $total_expense = pg_fetch_assoc($r2)['total'] ?? 0;
 
-    $r2 = pg_query_params($conn, "SELECT goal_amount, goal_purpose FROM goals WHERE user_id=$1", array($user_id));
+    $r2 = pg_query_params($conn, 
+        "SELECT goal_amount, goal_purpose, savings_amount FROM goals 
+         WHERE user_id=$1 ORDER BY created_at DESC LIMIT 1", 
+        array($user_id));
     $goal = pg_fetch_assoc($r2);
 
-    $savings = $total_income - $total_expense;
+    $savings = $goal['savings_amount'] ?? 0;
+
 
     // insert summary
     pg_query_params($conn, "
@@ -84,30 +94,77 @@ if (pg_num_rows($r) == 0) {
 
 // ================= SEARCH =================
 
-$record      = null;
-$income_data  = [];
+// Only search if form is submitted
+$record = null;
+$income_data = [];
 $expense_data = [];
 
 if (isset($_GET['month'], $_GET['year'])) {
-
     $m = $_GET['month'];
     $y = $_GET['year'];
 
+    // First try to get from monthly_history
     $r = pg_query_params($conn, 
         "SELECT * FROM monthly_history WHERE user_id=$1 AND month=$2 AND year=$3",
         array($user_id, $m, $y)
     );
     $record = pg_fetch_assoc($r);
 
-    if ($record) {
+    // If no record in monthly_history, calculate from income, expenses, and goals tables
+    if (!$record) {
+        // Only use current tables for the active month
+        if ($m == $current_month && $y == $current_year) {
+            $r2 = pg_query_params($conn, "SELECT amount AS total FROM income WHERE user_id=$1 LIMIT 1", array($user_id));
+            $total_income = pg_fetch_assoc($r2)['total'] ?? 0;
+
+            $r2 = pg_query_params($conn, "SELECT amount AS total FROM expenses WHERE user_id=$1 LIMIT 1", array($user_id));
+            $total_expense = pg_fetch_assoc($r2)['total'] ?? 0;
+
+            $r2 = pg_query_params($conn, "SELECT savings_amount, goal_amount, goal_purpose FROM goals WHERE user_id=$1 ORDER BY created_at DESC LIMIT 1", array($user_id));
+            $goal = pg_fetch_assoc($r2);
+
+            $savings = $goal['savings_amount'] ?? 0;
+
+            // Create record from active data for current month
+            $record = [
+                'total_income' => $total_income,
+                'total_expense' => $total_expense,
+                'savings' => $savings,
+                'goal_amount' => $goal['goal_amount'] ?? 0,
+                'goal_purpose' => $goal['goal_purpose'] ?? 'No goal set',
+                'month' => $m,
+                'year' => $y
+            ];
+        }
+    }
+
+    // Get breakdown data from monthly_breakdown
+    $r = pg_query_params($conn, 
+        "SELECT category, amount, type FROM monthly_breakdown WHERE user_id=$1 AND month=$2 AND year=$3",
+        array($user_id, $m, $y)
+    );
+
+    while ($row = pg_fetch_assoc($r)) {
+        if ($row['type'] == 'income') $income_data[] = $row;
+        else $expense_data[] = $row;
+    }
+
+    // If no breakdown data and this is the current active month, get from current occupation details
+    if (empty($income_data) && empty($expense_data) && $m == $current_month && $y == $current_year) {
         $r = pg_query_params($conn, 
-            "SELECT category, amount, type FROM monthly_breakdown WHERE user_id=$1 AND month=$2 AND year=$3",
-            array($user_id, $m, $y)
+            "SELECT field_name, field_value FROM occupation_details WHERE user_id=$1 AND field_value > 0",
+            array($user_id)
         );
 
         while ($row = pg_fetch_assoc($r)) {
-            if ($row['type'] == 'income') $income_data[] = $row;
-            else $expense_data[] = $row;
+            $name = $row['field_name'];
+            $value = $row['field_value'];
+
+            if (strpos($name, 'income') !== false) {
+                $income_data[] = ['category' => $name, 'amount' => $value, 'type' => 'income'];
+            } elseif (strpos($name, 'expense') !== false) {
+                $expense_data[] = ['category' => $name, 'amount' => $value, 'type' => 'expense'];
+            }
         }
     }
 }
