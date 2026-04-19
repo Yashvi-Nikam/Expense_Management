@@ -70,7 +70,7 @@ pg_close($conn);
         </label>        <input type="hidden" name="occupation" value="<?php echo htmlspecialchars($occupation); ?>">        <br><br>
         <button type="submit">Update Basic Info</button>
         <br><br>
-        <a href="edit_student.php" style="display: inline-block; padding: 10px 20px; background: #4caf50; color: white; text-decoration: none; border-radius: 4px;">Edit Student Details</a>
+        
     </form>
 </div>
 </body>

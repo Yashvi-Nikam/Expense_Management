@@ -23,7 +23,7 @@ foreach ($fields as $field) {
     $raw = $result['field_value'] ?? $result['field_text'] ?? '';
     $data[$field] = is_numeric($raw) ? floatval($raw) : $raw;
 }
-echo "<pre>"; print_r($data); echo "</pre>";
+
 pg_close($conn);
 ?>
 

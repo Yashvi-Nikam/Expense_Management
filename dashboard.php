@@ -109,6 +109,13 @@ $percent = round($percent);
 /* LIMIT PROGRESS TO 100% */
 if($percent > 100) $percent = 100;
 
+/* GOAL CONGRATULATION FLAG */
+$show_goal_alert = false;
+if ($percent >= 100 && !isset($_SESSION['goal_congratulated'])) {
+    $show_goal_alert = true;
+    $_SESSION['goal_congratulated'] = true;
+}
+
 /* PIE DATA */
 $categories = [];
 $amounts    = [];
@@ -328,6 +335,7 @@ const totalIncome = <?php echo $total_income;?>;
 const totalExpense = <?php echo $total_expense;?>;
 
 const savingsPercent = <?php echo $percent;?>;
+const showGoalAlert = <?php echo $show_goal_alert ? 'true' : 'false'; ?>;
 
 </script>
 

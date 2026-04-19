@@ -1,4 +1,4 @@
-sessionStorage.clear();
+
 
 /* ---------------- SIDEBAR TOGGLE ---------------- */
 
@@ -216,38 +216,34 @@ maintainAspectRatio:false
 
 /* ---------------- THANK YOU MESSAGE ---------------- */
 
-if(savingsPercent >= 100){
+if(showGoalAlert){
     alert("🎉 Congratulations! You reached your savings goal!");
     window.location.href = "thank_you.php";
 
-} else{
+} else {
 
     /* ---------------- EDIT PROMPT ---------------- */
-
-    setTimeout(function(){
-        let edit = confirm("Do you want to edit something?");
-        if(edit){
-            
-            toggleMenu();
-        }
-    }, 1500);
-
+    if(!sessionStorage.getItem("editPromptShown")){
+        setTimeout(function(){
+            let edit = confirm("Do you want to edit something?");
+            if(edit){
+                toggleMenu();
+            }
+            sessionStorage.setItem("editPromptShown", "true");
+        }, 1500);
+    }
 
     /* ---------------- MONTH END REPORT ---------------- */
-
     let today = new Date();
     let lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
 
     if(today.getDate() === lastDay){
-
         setTimeout(function(){
             let report = confirm("Your monthly report is ready! Do you want to view it?");
             if(report){
-               
-            toggleMenu();
+                toggleMenu();
             }
         }, 3000);
-
     }
 
 }

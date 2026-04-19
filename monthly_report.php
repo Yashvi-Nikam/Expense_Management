@@ -29,22 +29,25 @@ function formatINR($number) {
 }
 
 $user_id = $_SESSION['user_id'];
-$current_month = date('m');
-$current_year  = date('Y');
+
+/* TOTAL INCOME & EXPENSE */
+$r = pg_query_params($conn, "SELECT amount FROM income WHERE user_id=$1", array($user_id));
+$total_income = pg_fetch_assoc($r)['amount'] ?? 0;
+
+$r = pg_query_params($conn, "SELECT amount FROM expenses WHERE user_id=$1", array($user_id));
+$total_expense = pg_fetch_assoc($r)['amount'] ?? 0;
+
+$savings = $total_income - $total_expense;
 
 /* INCOME BREAKDOWN */
 $incomeBreakdown = [];
 $r = pg_query_params($conn, "
-    SELECT field_name, SUM(field_value) AS total
+    SELECT field_name, field_value AS total
     FROM occupation_details
     WHERE user_id=$1
     AND field_name LIKE '%income%'
-    AND field_value IS NOT NULL
-    AND EXTRACT(MONTH FROM created_at)=$2
-    AND EXTRACT(YEAR FROM created_at)=$3
-    GROUP BY field_name
-", array($user_id, $current_month, $current_year));
-
+    AND field_value > 0
+", array($user_id));
 while ($row = pg_fetch_assoc($r)) {
     $incomeBreakdown[] = $row;
 }
@@ -52,31 +55,15 @@ while ($row = pg_fetch_assoc($r)) {
 /* EXPENSE BREAKDOWN */
 $expenseBreakdown = [];
 $r = pg_query_params($conn, "
-    SELECT field_name, SUM(field_value) AS total
+    SELECT field_name, field_value AS total
     FROM occupation_details
     WHERE user_id=$1
     AND field_name LIKE '%expense%'
-    AND EXTRACT(MONTH FROM created_at)=$2
-    AND EXTRACT(YEAR FROM created_at)=$3
-    GROUP BY field_name
-", array($user_id, $current_month, $current_year));
-
+    AND field_value > 0
+", array($user_id));
 while ($row = pg_fetch_assoc($r)) {
     $expenseBreakdown[] = $row;
 }
-
-/* TOTAL INCOME & EXPENSE */
-$total_income = 0;
-$total_expense = 0;
-$savings = 0;
-
-foreach ($incomeBreakdown as $item) {
-    $total_income += $item['total'];
-}
-foreach ($expenseBreakdown as $item) {
-    $total_expense += $item['total'];
-}
-$savings = $total_income - $total_expense;
 
 /* GOALS DATA */
 $goals = [];
@@ -84,6 +71,7 @@ $r = pg_query_params($conn, "
     SELECT goal_amount, goal_purpose
     FROM goals
     WHERE user_id=$1
+    LIMIT 1
 ", array($user_id));
 
 while ($row = pg_fetch_assoc($r)) {
