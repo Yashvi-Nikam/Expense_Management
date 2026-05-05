@@ -104,7 +104,7 @@ The system uses multiple relational tables:
 ![Form 1](form1.jpg)
 ![Form 2](form2.jpg)
 ![Form 3](form3.jpg)
-![Form 4](form4.jpg)
+![Form 4](form4.jpeg)
 ![Form 5](form5.jpg)
 
 #### Validations
