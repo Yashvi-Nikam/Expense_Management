@@ -175,6 +175,4 @@ http://localhost/Expense_Management/index.html
 
 ---
 
-## 👩‍💻 Author
 
-**Yashvi Nikam**
